@@ -6,6 +6,10 @@ import type {
   TagsPropertyLabels,
 } from '@tc96/ui/patterns/properties/core'
 import type { PersonPropertyOption } from '@tc96/ui/patterns/properties/display/person/person-option-content'
+import type {
+  RecordPreviewStatus,
+  RecordPreviewStatusLabels,
+} from '@tc96/ui/patterns/records/preview/core'
 
 export type RecordPreview3Person = PersonPropertyOption
 
@@ -64,6 +68,7 @@ export interface RecordPreview3Labels {
   copyId: string
   date: Partial<DatePropertyLabels>
   expand: string
+  fallbackTitle: string
   fields: Record<RecordPreview3Field, string>
   groups: Record<RecordPreview3Group, string>
   noCreator: string
@@ -71,16 +76,18 @@ export interface RecordPreview3Labels {
   noPriority: string
   peoplePicker: Partial<PeoplePropertyLabels>
   select: Partial<SelectPropertyLabels>
+  status: RecordPreviewStatusLabels
   tagPicker: Partial<TagsPropertyLabels>
   tagsPlaceholder: string
   unassigned: string
 }
 
 export type RecordPreview3LabelsOverride = Partial<
-  Omit<RecordPreview3Labels, 'fields' | 'groups'>
+  Omit<RecordPreview3Labels, 'fields' | 'groups' | 'status'>
 > & {
   fields?: Partial<RecordPreview3Labels['fields']>
   groups?: Partial<RecordPreview3Labels['groups']>
+  status?: Partial<RecordPreview3Labels['status']>
 }
 
 export interface RecordPreview3Props {
@@ -93,9 +100,11 @@ export interface RecordPreview3Props {
   onExpand?: () => void
   onOpenChange: (open: boolean) => void
   onRecordChange: (changes: RecordPreview3Changes) => void
+  onRetry?: () => void
   open: boolean
   people: readonly RecordPreview3Person[]
-  record: RecordPreview3Record
+  record: RecordPreview3Record | null
+  status?: RecordPreviewStatus
   tags: readonly PropertyOption[]
   timeZone?: string
 }

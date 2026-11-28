@@ -18,6 +18,8 @@ export interface RecordGroupProps {
   defaultOpen?: boolean
   empty?: boolean
   footer?: ReactNode
+  loading?: boolean
+  loadingLabel?: string
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title?: ReactNode

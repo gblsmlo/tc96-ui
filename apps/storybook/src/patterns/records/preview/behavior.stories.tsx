@@ -1,10 +1,5 @@
-import { ArrowsOutSimpleIcon } from '@phosphor-icons/react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import {
-  RecordPreview,
-  RecordPreviewAction,
-  type RecordPreviewProps,
-} from '@tc96/ui/patterns'
+import { RecordPreview, type RecordPreviewProps } from '@tc96/ui/patterns'
 import { useState } from 'react'
 import { expect, fn, mocked, userEvent, waitFor, within } from 'storybook/test'
 
@@ -24,11 +19,7 @@ const longBody = (
 const longTitle =
   'Rework the onboarding flow so that the sign-up, the e-mail check and the first project share one continuous path'
 
-const openAsPage = (
-  <RecordPreviewAction label="Open as page">
-    <ArrowsOutSimpleIcon aria-hidden />
-  </RecordPreviewAction>
-)
+const openAsPage = { label: 'Open as page', onClick: () => undefined }
 
 const page = (canvasElement: HTMLElement) =>
   within(canvasElement.ownerDocument.body)
@@ -130,8 +121,8 @@ export const NamedByTitleWithOneCloseButton: Story = {
 
 export const DescriptionAndActionsBeforeClose: Story = {
   args: {
-    actions: <button type="button">Open page</button>,
     description: 'Sprint 12',
+    expand: { label: 'Open page', onClick: () => undefined },
   },
   play: async ({ canvasElement }) => {
     const dialog = await page(canvasElement).findByRole('dialog', {
@@ -141,9 +132,9 @@ export const DescriptionAndActionsBeforeClose: Story = {
     const close = within(dialog).getByRole('button', { name: 'Close preview' })
 
     await expect(within(dialog).getByText('Sprint 12')).toBeTruthy()
-    await expect(slot?.contains(within(dialog).getByText('Open page'))).toBe(
-      true,
-    )
+    await expect(
+      slot?.contains(within(dialog).getByRole('button', { name: 'Open page' })),
+    ).toBe(true)
     await expect(slot?.parentElement).toBe(close.parentElement)
     await expect(
       (slot?.compareDocumentPosition(close) ?? 0) &
@@ -270,7 +261,7 @@ export const EscapeReturnsFocusToTheTriggerAfterKeyboardOpen: Story = {
 }
 
 export const LongTitleWrapsInsteadOfTruncating: Story = {
-  args: { actions: openAsPage, description: 'Sprint 12', title: longTitle },
+  args: { description: 'Sprint 12', expand: openAsPage, title: longTitle },
   play: async ({ canvasElement }) => {
     await page(canvasElement).findByRole('dialog', {
       name: /^Rework the onboarding flow/,
@@ -288,7 +279,7 @@ export const LongTitleWrapsInsteadOfTruncating: Story = {
 }
 
 export const CloseButtonStaysInsideWithLongTitle: Story = {
-  args: { actions: openAsPage, description: 'Sprint 12', title: longTitle },
+  args: { description: 'Sprint 12', expand: openAsPage, title: longTitle },
   play: async ({ canvasElement }) => {
     const dialog = await page(canvasElement).findByRole('dialog', {
       name: /^Rework the onboarding flow/,

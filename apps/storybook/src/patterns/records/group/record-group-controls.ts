@@ -26,6 +26,7 @@ export interface RecordGroupControls {
   empty: boolean
   footer: boolean
   leading: boolean
+  loading: boolean
   title: string
   variant: RecordGroupVariant
 }
@@ -39,6 +40,7 @@ export const recordGroupControlArgs: RecordGroupControls = {
   empty: false,
   footer: true,
   leading: true,
+  loading: false,
   title: 'Details',
   variant: 'plain',
 }
@@ -82,6 +84,11 @@ export const recordGroupControlArgTypes: Partial<
   leading: {
     control: 'boolean',
     description: 'Gives every `RecordGroupRow` an icon in `leading`.',
+  },
+  loading: {
+    control: 'boolean',
+    description:
+      'Sets `loading`, which replaces the rows with three skeleton rows named "Loading the details" and hides `footer`.',
   },
   title: {
     control: 'text',

@@ -1,3 +1,4 @@
+import { mergeRecordPreviewLabels } from '../shared/merge-labels'
 import type {
   RecordPreview3Labels,
   RecordPreview3LabelsOverride,
@@ -8,6 +9,7 @@ export const defaultRecordPreview3Labels: RecordPreview3Labels = {
   copyId: 'Copy ID',
   date: {},
   expand: 'Expand',
+  fallbackTitle: 'Task',
   fields: {
     assignees: 'Assignees',
     creator: 'Created by',
@@ -28,6 +30,15 @@ export const defaultRecordPreview3Labels: RecordPreview3Labels = {
   noPriority: 'No priority',
   peoplePicker: {},
   select: {},
+  status: {
+    errorDescription: 'Close the details and try again.',
+    errorTitle: 'The task could not be loaded',
+    loading: 'Loading the task',
+    notFoundDescription:
+      'It may have been deleted or you may no longer have access.',
+    notFoundTitle: 'Task not found',
+    retry: 'Try again',
+  },
   tagPicker: {},
   tagsPlaceholder: 'Add a tag',
   unassigned: 'Unassigned',
@@ -36,11 +47,9 @@ export const defaultRecordPreview3Labels: RecordPreview3Labels = {
 export function resolveRecordPreview3Labels(
   labels?: RecordPreview3LabelsOverride,
 ): RecordPreview3Labels {
-  const base = defaultRecordPreview3Labels
-  return {
-    ...base,
-    ...labels,
-    fields: { ...base.fields, ...labels?.fields },
-    groups: { ...base.groups, ...labels?.groups },
-  }
+  return mergeRecordPreviewLabels(defaultRecordPreview3Labels, labels, [
+    'fields',
+    'groups',
+    'status',
+  ])
 }

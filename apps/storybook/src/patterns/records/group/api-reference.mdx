@@ -80,6 +80,8 @@ A titled group that folds its body. Renders a `section` named by an `h2` that wr
 | `chevron` | `"start"` or `"end"` | `"start"` | Places the chevron before the title or right after it, inside the trigger. |
 | `collapsible` | `boolean` | `true` | When false, renders the title in the `h2` with no button and no chevron and the body and `footer` always shown; `open`, `defaultOpen`, `onOpenChange` and `chevron` are ignored. |
 | `footer` | `ReactNode` | - | Renders content below the body, inside the panel; it hides with the body. |
+| `loading` | `boolean` | `false` | When true, replaces `children` with three skeleton rows in the row layout, hides `footer` and sets `aria-busy` on the `section`. |
+| `loadingLabel` | `string` | - | Sets the accessible name of the skeleton rows while `loading`; there is no default. |
 | `children` | `ReactNode` | - | Sets the body. |
 | `className` | `string` | - | Adds classes to the `section`, not to the visible card. |
 
@@ -97,9 +99,12 @@ A titled group that folds its body. Renders a `section` named by an `h2` that wr
 | `data-starting-style`, `data-ending-style` | present during the 200ms height transition | Set on the `section`, the trigger and the panel while it opens or closes |
 | `data-slot` | `"record-group-content"` | Selects the body, a `div` |
 | `data-slot` | `"record-group-footer"` | Selects the wrapper of `footer`; it renders only with `footer` |
+| `data-slot` | `"record-group-loading"` | Selects the skeleton rows, an `output` with `aria-busy`; it renders only while `loading` |
 | `data-slot` | `"card"` | Selects the frame of `card` and `inset` |
 
 With `empty` the group starts closed whatever `defaultOpen` says. Only the flip of `empty` from `true` to `false` opens it, without calling `onOpenChange`; a flip back to `true` leaves it as it is, a manual collapse after the flip survives re-renders, and `empty` never overrides a controlled `open`. The body of an empty group has no vertical padding and keeps its text at the start.
+
+The group owns the loading feedback of the records it holds: while `loading`, the title and `actions` stay and the body shows three skeleton rows, a label and a value each, named by `loadingLabel`. `RecordPreviewFrame` renders a group like this while its lookup loads.
 
 The panel gets `inert` as soon as the group closes, so the footer leaves the tab order during the 200ms height transition, and the panel is unmounted after it. Put controls that must stay reachable in `actions`.
 
