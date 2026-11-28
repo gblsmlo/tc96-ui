@@ -11,7 +11,7 @@ The block is controlled and renders what it gets. Every variant shares the frame
 
 **Lançamentos** and **A cobrar** share the view switcher in the toolbar `left` slot (Todos, A receber, A pagar, A cobrar, Quitados, with `counts` and the saved views after them), so these pages have no `h2`. The block only reports the view; the consumer applies it and passes `variant="receivables"` while the view is A cobrar, since the queue takes the place of the entries table. `views` limits the list (A cobrar only for who can collect).
 
-- `entries`: Descrição, Tipo, Tipo de honorário, Pagador, Caso ou processo, Responsável, Conta, Categoria, Vencimento, Valor and Situação. Conta, Categoria, Tipo de honorário and Responsável start hidden; Exibição holds the Colunas submenu (`hiddenColumns`), Ordenar por (`sort`, a column and a direction), and the Situação, Tipo, Tipo de honorário and Conta filters, each rendered with its callback; Salvar preferência renders with `onSavePreference`. Responsável, Conta and Categoria are editable in a row with `canEdit` and their callback; Categoria offers the categories of the entry's direction. A transfer shows its two accounts. Valor carries the sign of the kind: income in the success tone, expense with a minus. Selecting rows opens the `ActionBar` with Quitar (Quitar na conta, the accounts) and Responsável (Atribuir a, the members); each reports only the selected entries with `canSettle` or `canEdit`, and is disabled when there is none.
+- `entries`: Descrição, Tipo, Tipo de honorário, Pagador, Caso ou processo, Responsável, Conta, Categoria, Vencimento, Valor and Situação. Conta, Categoria, Tipo de honorário and Responsável start hidden; Exibição holds the Colunas submenu (`hiddenColumns`), Ordenar por (`sort`, a column and a direction), and the Situação, Tipo, Tipo de honorário and Conta filters, each rendered with its callback; Salvar preferência renders with `onSavePreference`. Responsável, Conta and Categoria are editable in a row with `canEdit` and their callback; Categoria offers the categories of the entry's direction. A transfer shows its two accounts. Valor follows the `Intl` sign standard: income unsigned in the success tone, expense with a minus. Selecting rows opens the `ActionBar` with Quitar (Quitar na conta, the accounts) and Responsável (Atribuir a, the members); each reports only the selected entries with `canSettle` or `canEdit`, and is disabled when there is none.
 - `receivables`: Pagador, Parcela, Valor, Vencimento and Último contato (ready texts), Cobrança (the charge status or the failure day, else Sem cobrança) and a row menu with Cobrar (disabled without `canContact`), Marcar cobrado and Emitir or Reemitir cobrança by `chargeAction`. The bulk action is Marcar cobrado. `truncated` shows a notice in the frame's `notice` slot.
 - `statement`: Data, Descrição, Tipo (a settlement reads Entrada or Saída by its sign), Outra conta, Categoria, Motivo, Valor (signed) and Saldo (running). The heading is Extrato, and its description is the summary: the account, the period and Saldo anterior. The table footer shows Saldo final in the Saldo column, through the column `footer` of the `DataTable`. Exibição holds Conta (`accounts`) and Período (`periods`); Exportar mês renders with `onExport`, disabled while `exporting`, and `exportError` shows an `Alert` with Tentar de novo. Only a line with `entryId` opens.
 - `clientMoney`: Cliente and Saldo, with the heading Dinheiro de clientes and no filters.
@@ -87,6 +87,8 @@ import { Finance3 } from '@tc96/ui/blocks/data/finance/finance-3'
 | `hiddenColumns`, `onHiddenColumnsChange` | `Finance3EntryColumnId[]`, `(ids) => void` | Conta, Categoria, Tipo de honorário, Responsável | The columns hidden by the Colunas submenu. |
 | `onSavePreference` | `() => void` | - | Renders Salvar preferência in Exibição. |
 | `onResponsibleChange`, `onAccountChange`, `onCategoryChange` | `(entryId, value) => void` | - | Make those cells editable in a row with `canEdit`. |
+| `onDueChange` | `(entryId, dueOn: string) => void` | - | Makes Vencimento a date picker in a row with `canEditDue` (or `canEdit` when it is absent); `dueOn` is the picked day, `YYYY-MM-DD`. |
+| `onAmountChange` | `(entryId, amount: number) => void` | - | Makes Valor an inline field in a row with `canEditAmount` (or `canEdit` when it is absent); the typed value is read in the block's `locale` and sent in cents, only when it changed and is above zero. |
 | `onBulkSettle`, `onBulkResponsibleChange` | `(entryIds, id) => void` | - | Render Quitar and Responsável in the action bar. |
 | `onOpen` | `(entryId) => void` | - | Makes a row open the entry. |
 
@@ -95,6 +97,7 @@ import { Finance3 } from '@tc96/ui/blocks/data/finance/finance-3'
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `onMarkCollected` | `(ids: string[]) => void` | - | Renders Marcar cobrado in the row menu and in the action bar. |
+| `onOpen` | `(entryId: string) => void` | - | Makes a row open the receivable, named by `labels.receivables.openRecord`. The Cobrar menu and the other row controls keep working and never open the row. |
 | `onContact`, `onIssueCharge`, `onReissueCharge` | `(id: string) => void` | - | Render Cobrar, Emitir cobrança and Reemitir cobrança in the row menu. |
 | `truncated` | `boolean` | `false` | Shows the notice that the queue is cut. |
 
@@ -118,7 +121,7 @@ import { Finance3 } from '@tc96/ui/blocks/data/finance/finance-3'
 
 | Type | Fields |
 | --- | --- |
-| `Finance3Entry` | `id`, `description`, `kind`, `feeType`, `payer`, `target`, `responsibleId`, `accountId`, `counterpartAccountId`, `categoryId`, `dueOn`, `amount` (expected cents), `situation`, `canEdit`, `canSettle` |
+| `Finance3Entry` | `id`, `description`, `kind`, `feeType`, `payer`, `target`, `responsibleId`, `accountId`, `counterpartAccountId`, `categoryId`, `dueOn`, `amount` (expected cents), `situation`, `canEdit`, `canEditAmount`, `canEditDue`, `canSettle` |
 | `Finance3Receivable` | `id`, `payer`, `installment`, `amount`, `due` (`{ label, tone }`), `lastContact`, `charge`, `chargeFailedOn`, `chargeAction`, `canContact` |
 | `Finance3StatementLine` | `id`, `day`, `description`, `kind`, `counterpartAccount`, `category`, `reason`, `amount` (signed), `balance`, `entryId` |
 | `Finance3ClientBalance` | `id`, `name`, `amount` |

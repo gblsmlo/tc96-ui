@@ -29,6 +29,8 @@ import type {
 
 export { legal8Views } from './legal-8-options'
 
+const noIds: string[] = []
+
 export function Legal8({
   className,
   counts,
@@ -38,7 +40,9 @@ export function Legal8({
   locale = defaultDataCollectionLocale,
   nextSweepAt,
   onOpenFailure,
+  onOpenRun,
   onOriginFilterChange,
+  onResolveFailures,
   onRetry,
   onRun,
   onSavedViewCreate,
@@ -48,6 +52,7 @@ export function Legal8({
   onSavedViewSelect,
   onSavedViewUpdate,
   onSavePreference,
+  onSelectedFailureIdsChange,
   onSortChange,
   onViewChange,
   originFilter: originFilterProp,
@@ -60,6 +65,8 @@ export function Legal8({
   savedViews,
   savedViewsLoading,
   savedViewsPending,
+  selectedFailureIds: selectedFailureIdsProp,
+  showStatus = true,
   sort: sortProp,
   stoppedSince,
   timeZone = defaultDataCollectionTimeZone,
@@ -83,7 +90,16 @@ export function Legal8({
       null,
       onOriginFilterChange,
     )
+  const [selectedFailureIds, setSelectedFailureIds] = useControllable<string[]>(
+    selectedFailureIdsProp,
+    noIds,
+    onSelectedFailureIdsChange,
+  )
+  const failuresSelectable = Boolean(
+    selectedFailureIdsProp || onSelectedFailureIdsChange || onResolveFailures,
+  )
   const reportFailure = useStableHandler(onOpenFailure)
+  const openRun = useStableHandler(onOpenRun)
   const onFailuresView = view === 'failures'
 
   const openFailure = useCallback(
@@ -99,9 +115,10 @@ export function Legal8({
       labels,
       locale,
       onOpenFailure: reportFailure ? openFailure : undefined,
+      onOpenRun: openRun,
       timeZone,
     }),
-    [labels, locale, openFailure, reportFailure, timeZone],
+    [labels, locale, openFailure, openRun, reportFailure, timeZone],
   )
 
   const loadState = dataCollectionLoadState({
@@ -118,17 +135,19 @@ export function Legal8({
       data-block="legal-8"
       data-view={view}
       notice={
-        <Legal8StatusNotice
-          labels={labels}
-          locale={locale}
-          nextSweepAt={nextSweepAt}
-          onRun={onRun}
-          pending={pending}
-          runError={runError}
-          running={running}
-          stoppedSince={stoppedSince}
-          timeZone={timeZone}
-        />
+        showStatus ? (
+          <Legal8StatusNotice
+            labels={labels}
+            locale={locale}
+            nextSweepAt={nextSweepAt}
+            onRun={onRun}
+            pending={pending}
+            runError={runError}
+            running={running}
+            stoppedSince={stoppedSince}
+            timeZone={timeZone}
+          />
+        ) : undefined
       }
       title={labels.title}
       toolbar={
@@ -177,7 +196,19 @@ export function Legal8({
     >
       {loadState ??
         (onFailuresView ? (
-          <Legal8FailuresTable context={context} failures={failures} />
+          <Legal8FailuresTable
+            context={context}
+            failures={failures}
+            selection={
+              failuresSelectable
+                ? {
+                    onResolve: onResolveFailures,
+                    onSelectedIdsChange: setSelectedFailureIds,
+                    selectedIds: selectedFailureIds,
+                  }
+                : undefined
+            }
+          />
         ) : (
           <Legal8RunsTable context={context} runs={runs} />
         ))}

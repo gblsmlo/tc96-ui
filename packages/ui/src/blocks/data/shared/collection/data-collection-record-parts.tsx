@@ -1,3 +1,4 @@
+import { Checkbox } from '@tc96/ui/checkbox'
 import {
   KanbanCard,
   KanbanCardBody,
@@ -19,9 +20,14 @@ import {
   ListRowHeader,
   ListRowLeading,
   ListRowOpenTrigger,
+  ListRowSelect,
   ListRowTitle,
   ListRowTrailing,
 } from '@tc96/ui/patterns/list-view/components/list-row'
+import {
+  ListViewHeader,
+  ListViewHeaderCell,
+} from '@tc96/ui/patterns/list-view/components/list-view-header'
 import { Fragment, type ReactNode } from 'react'
 
 export function DataCollectionCaption({
@@ -51,6 +57,47 @@ export function DataCollectionTitleCell({
   )
 }
 
+const listSelectWidth = '-me-0.5 w-5 ps-1'
+
+export interface DataCollectionListHeaderSelection {
+  checked: boolean
+  indeterminate: boolean
+  label: string
+  onCheckedChange: (checked: boolean) => void
+}
+
+export function DataCollectionListHeader({
+  selection,
+  title,
+}: Readonly<{
+  selection: DataCollectionListHeaderSelection
+  title: string
+}>) {
+  return (
+    <ListViewHeader data-slot="data-collection-list-header">
+      <ListViewHeaderCell always className={listSelectWidth}>
+        <Checkbox
+          aria-label={selection.label}
+          checked={selection.checked}
+          indeterminate={selection.indeterminate}
+          onCheckedChange={(checked) =>
+            selection.onCheckedChange(checked === true)
+          }
+        />
+      </ListViewHeaderCell>
+      <ListViewHeaderCell always className="flex-1">
+        {title}
+      </ListViewHeaderCell>
+    </ListViewHeader>
+  )
+}
+
+export interface DataCollectionListRowSelection {
+  checked: boolean
+  label: string
+  onCheckedChange: (checked: boolean) => void
+}
+
 export interface DataCollectionListRowProps {
   actions?: ReactNode
   caption?: readonly string[]
@@ -59,6 +106,7 @@ export interface DataCollectionListRowProps {
   mark?: ReactNode
   onOpen?: () => void
   openLabel?: string
+  selection?: DataCollectionListRowSelection
   title: string
 }
 
@@ -70,6 +118,7 @@ export function DataCollectionListRow({
   mark,
   onOpen,
   openLabel,
+  selection,
   title,
 }: Readonly<DataCollectionListRowProps>) {
   const heading = (
@@ -85,7 +134,19 @@ export function DataCollectionListRow({
   )
 
   return (
-    <ListRow interactive={Boolean(onOpen)}>
+    <ListRow interactive={Boolean(onOpen)} selected={selection?.checked}>
+      {selection ? (
+        <ListRowLeading className={listSelectWidth}>
+          <ListRowSelect
+            aria-label={selection.label}
+            checked={selection.checked}
+            className="me-0"
+            onCheckedChange={(checked) =>
+              selection.onCheckedChange(checked === true)
+            }
+          />
+        </ListRowLeading>
+      ) : null}
       {icon ? <ListRowLeading>{icon}</ListRowLeading> : null}
       <ListRowBody>
         {mark ? (

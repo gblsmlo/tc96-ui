@@ -8,6 +8,7 @@ import type { Legal8Labels, Legal8LabelsOverride } from './types'
 export const defaultLegal8Labels: Legal8Labels = {
   ...defaultDataCollectionLoadLabels,
   allOrigins: 'Todas as origens',
+  clearSelection: 'Limpar seleção',
   clearFilters: defaultDataCollectionToolbarLabels.clearFilters,
   display: defaultDataCollectionToolbarLabels.display,
   errorTitle: 'Não foi possível carregar o monitoramento',
@@ -41,7 +42,9 @@ export const defaultLegal8Labels: Legal8Labels = {
   noValue: '—',
   openFailure: 'Ver falha',
   openFailureRow: (kind) => `Abrir falha ${kind}`,
+  openRunRow: (kind) => `Abrir execução ${kind}`,
   origin: 'Origem',
+  resolve: 'Resolver',
   retryNow: 'Tentar agora',
   runColumns: {
     error: 'Último erro',
@@ -73,6 +76,11 @@ export const defaultLegal8Labels: Legal8Labels = {
     savedViews: 'Minhas visões',
   },
   savePreference: 'Salvar preferência',
+  selectAllFailures: 'Selecionar todas as falhas',
+  selectedCount: (count) =>
+    `${count} ${count === 1 ? 'selecionada' : 'selecionadas'}`,
+  selectFailure: (kind) => `Selecionar falha ${kind}`,
+  selectionActions: 'Ações das falhas selecionadas',
   simulated: 'Simulado',
   sort: 'Ordenar',
   sortBy: 'Ordenar por',

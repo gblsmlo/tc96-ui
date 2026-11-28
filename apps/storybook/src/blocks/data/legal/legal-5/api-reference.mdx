@@ -70,6 +70,7 @@ import { Legal5 } from '@tc96/ui/blocks/data/legal/legal-5'
 | `onSavedViewCreate`, `onSavedViewUpdate` | `() => void` | - | Render Salvar visão atual… and, on a changed active view, Atualizar. |
 | `onSavePreference` | `() => void` | - | Renders Salvar preferência at the end of Exibição. |
 | `mode`, `onModeChange` | `'table' \| 'list'`, `(mode) => void` | `'table'` | The controllable layout. |
+| `modes` | `readonly Legal5Mode[]` | `['table', 'list']` | The layouts the settings menu offers; with one layout the layout switch is not shown. |
 | `groupBy`, `onGroupByChange` | `'phase' \| 'owner' \| null`, `(groupBy) => void` | `null` | The controllable grouping of the Tabela and the Lista; Agrupar por renders with `onGroupByChange`. |
 | `collapsedGroupIds`, `onCollapsedGroupIdsChange` | `string[]`, `(groupIds) => void` | - | The collapsed groups (`phase:<id>`, `owner:<id>`, `owner:unassigned`); without the value the layout keeps them. |
 | `search`, `onSearchChange` | `string`, `(search) => void` | - | The search field, rendered with `onSearchChange`; called on submit, when emptied and by Limpar filtros. A non-empty search counts as one filter. |
@@ -86,7 +87,7 @@ import { Legal5 } from '@tc96/ui/blocks/data/legal/legal-5'
 | `onTagsChange` | `(recordId: string, tagIds: string[]) => void` | - | Makes Tags editable in a row of the Tabela and the Lista. |
 | `onUnarchive` | `(recordId: string) => void` | - | Renders Desarquivar on an archived Processo. |
 | `onOpen` | `(recordId: string) => void` | - | Makes the row and the list title open the record. |
-| `selectedIds`, `onSelectedIdsChange` | `string[]`, `(recordIds) => void` | `[]` | The controllable row selection of the Tabela. Either one, or a bulk callback, adds the select column. |
+| `selectedIds`, `onSelectedIdsChange` | `string[]`, `(recordIds) => void` | `[]` | The controllable row selection of the Tabela and the Lista. Either one, or a bulk callback, adds the select column, a checkbox on each Lista row, a select-all checkbox in the Lista header and the action bar, which sits at the bottom of the block in the Lista. |
 | `onBulkPhaseChange`, `onBulkOwnerChange`, `onBulkTagAdd` | `(recordIds, value) => void` | - | Render Fase, Responsável and Tags in the action bar. |
 | `onBulkArchive` | `(recordIds: string[]) => void` | - | Renders Arquivar in the action bar. |
 | `page`, `onPageChange` | `number`, `(page) => void` | `1` | The controllable page, starting at 1. |
@@ -110,6 +111,7 @@ import { Legal5 } from '@tc96/ui/blocks/data/legal/legal-5'
 | `ownerId` | `string \| null` | One of `owners`. |
 | `tagIds` | `string[]` | Ids of `tags`, shown as badges, editable with `onTagsChange`. |
 | `archived` | `boolean` | Shows the muted Arquivado and, on a Processo, Desarquivar. |
+| `readOnly` | `boolean` | Optional. The member cannot edit the record: phase, owner and tags render read-only and Desarquivar is not offered. |
 
 ## Exports
 

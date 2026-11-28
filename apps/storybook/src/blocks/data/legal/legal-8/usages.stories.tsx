@@ -4,11 +4,13 @@ import {
   Legal8,
   type Legal8Failure,
   type Legal8FailureOrigin,
+  type Legal8Props,
   type Legal8Run,
   type Legal8Sort,
   type Legal8View,
 } from '@tc96/ui/blocks/data/legal/legal-8'
 import { useState } from 'react'
+import { expect, fn, userEvent, within } from 'storybook/test'
 import { apiUrl, fetchJson } from '../../../../mocks/api.ts'
 import { legal8Handlers } from '../../../../mocks/legal-8.ts'
 import { type Legal8SavedViewConfig, nextSweepAt } from '../fixtures/legal-8.ts'
@@ -30,9 +32,17 @@ const requestSweep = async () => {
   if (!response.ok) throw new Error(String(response.status))
 }
 
-const CourtMonitoring = () => {
+interface CourtMonitoringProps extends Pick<Legal8Props, 'onResolveFailures'> {
+  initialView?: Legal8View
+}
+
+const CourtMonitoring = ({
+  initialView = 'runs',
+  onResolveFailures,
+}: Readonly<CourtMonitoringProps>) => {
   const queryClient = useQueryClient()
-  const [view, setView] = useState<Legal8View>('runs')
+  const [view, setView] = useState<Legal8View>(initialView)
+  const [selectedFailureIds, setSelectedFailureIds] = useState<string[]>([])
   const [sort, setSort] = useState<Legal8Sort>('newest')
   const [origin, setOrigin] = useState<Legal8FailureOrigin | null>(null)
   const views = useSavedViewsQuery<Legal8SavedViewConfig>('monitoring', {
@@ -76,9 +86,15 @@ const CourtMonitoring = () => {
       failures={failures.data ?? []}
       nextSweepAt={nextSweepAt}
       onOpenFailure={() => undefined}
+      onOpenRun={() => undefined}
       onOriginFilterChange={setOrigin}
+      onResolveFailures={(ids) => {
+        onResolveFailures?.(ids)
+        queryClient.invalidateQueries({ queryKey: failuresKey })
+      }}
       onRetry={() => shown.refetch()}
       onRun={() => sweep.mutate()}
+      onSelectedFailureIdsChange={setSelectedFailureIds}
       onSortChange={setSort}
       onViewChange={(next) => {
         setView(next)
@@ -89,6 +105,7 @@ const CourtMonitoring = () => {
       runError={sweep.isError}
       running={sweep.isPending}
       runs={runs.data ?? []}
+      selectedFailureIds={selectedFailureIds}
       sort={sort}
       stoppedSince={stopped ?? null}
       view={view}
@@ -110,6 +127,32 @@ type Story = StoryObj<typeof meta>
 export const Loaded: Story = {
   beforeEach: ({ msw }) => {
     msw.use(...legal8Handlers.loaded, ...legal8Handlers.savedViews())
+  },
+}
+
+export const ResolveFailures: Story = {
+  args: { initialView: 'failures', onResolveFailures: fn() },
+  beforeEach: ({ msw }) => {
+    msw.use(...legal8Handlers.loaded, ...legal8Handlers.savedViews())
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement)
+    const checkboxes = await canvas.findAllByRole('checkbox', {
+      name: /^Selecionar falha /,
+    })
+    for (const checkbox of checkboxes.slice(0, 2))
+      await userEvent.click(checkbox)
+
+    const bar = within(
+      await canvas.findByRole('toolbar', {
+        name: 'Ações das falhas selecionadas',
+      }),
+    )
+    await expect(bar.getByText('2 selecionadas')).toBeVisible()
+    await userEvent.click(bar.getByRole('button', { name: 'Resolver' }))
+    await expect(args.onResolveFailures).toHaveBeenCalledWith(
+      expect.arrayContaining(['fail-30', 'fail-31']),
+    )
   },
 }
 

@@ -41,6 +41,7 @@ export function Finance3Receivables({
   onCreate,
   onIssueCharge,
   onMarkCollected,
+  onOpen,
   onPageChange,
   onReissueCharge,
   onRetry,
@@ -119,6 +120,7 @@ export function Finance3Receivables({
       getId={receivableId}
       getTitle={receivableTitle}
       labels={labels}
+      onOpen={onOpen ? (item) => onOpen(item.id) : undefined}
       notice={
         truncated ? (
           <Alert variant="info">

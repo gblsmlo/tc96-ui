@@ -1,5 +1,6 @@
 import type { DataTableColumnDef } from '@tc96/ui/patterns/data-table/data-table-features'
 import { createDataTableSelectColumn } from '@tc96/ui/patterns/data-table/data-table-select-column'
+import { DateProperty } from '@tc96/ui/patterns/properties/display/date/date-property'
 import { SelectProperty } from '@tc96/ui/patterns/properties/display/select/select-property'
 import { DataCollectionTitleCell } from '../../shared/collection/data-collection-record-parts'
 import {
@@ -8,7 +9,12 @@ import {
   DataSelect,
   dataSelectOptions,
 } from '../../shared/properties/data-properties'
-import { Finance3Amount, Finance3TextField } from './finance-3-fields'
+import {
+  Finance3Amount,
+  Finance3AmountField,
+  Finance3TextField,
+  finance3AmountName,
+} from './finance-3-fields'
 import type { Finance3Formatter } from './finance-3-format'
 import {
   finance3CategoryDirectionOf,
@@ -36,7 +42,9 @@ export interface Finance3EntriesContext {
   locale: string
   members: readonly Finance3Person[]
   onAccountChange?: (entryId: string, accountId: string | null) => void
+  onAmountChange?: (entryId: string, amount: number) => void
   onCategoryChange?: (entryId: string, categoryId: string | null) => void
+  onDueChange?: (entryId: string, dueOn: string) => void
   onResponsibleChange?: (entryId: string, memberId: string) => void
 }
 
@@ -44,6 +52,73 @@ type CellProps = Readonly<{
   context: Finance3EntriesContext
   item: Finance3Entry
 }>
+
+function DueField({ context, item }: CellProps) {
+  const { format, labels, locale, onDueChange } = context
+  const ariaLabel = labels.entries.columns.due
+  const value = format.dayValue(item.dueOn)
+  const overdue = item.situation === 'overdue'
+  if (!onDueChange || !(item.canEditDue ?? item.canEdit)) {
+    return (
+      <DataDate
+        ariaLabel={ariaLabel}
+        fallback={labels.noValue}
+        locale={locale}
+        overdue={overdue}
+        timeZone="UTC"
+        value={value}
+        variant="plain"
+      />
+    )
+  }
+  return (
+    <DateProperty
+      ariaLabel={ariaLabel}
+      isOverdue={overdue}
+      labels={{ fallback: labels.noValue }}
+      locale={locale}
+      onValueChange={(next) => {
+        if (next) onDueChange(item.id, next.slice(0, 10))
+      }}
+      timeZone="UTC"
+      value={value}
+      variant="plain"
+    />
+  )
+}
+
+function AmountField({ context, item }: CellProps) {
+  const { format, labels, onAmountChange } = context
+  const direction = finance3KindDirection[item.kind]
+  const label = finance3AmountName(
+    labels.amountName,
+    format,
+    item.amount,
+    direction,
+  )
+  if (!onAmountChange || !(item.canEditAmount ?? item.canEdit)) {
+    return (
+      <Finance3Amount
+        cents={item.amount}
+        direction={direction}
+        format={format}
+        label={label}
+      />
+    )
+  }
+  return (
+    <Finance3AmountField
+      ariaLabel={labels.entries.columns.amount}
+      cents={item.amount}
+      direction={direction}
+      format={format}
+      label={label}
+      onCommit={(amount) => {
+        if (amount !== item.amount) onAmountChange(item.id, amount)
+      }}
+    />
+  )
+}
 
 const labelOf = (options: readonly Finance3Option[], id: string | null) =>
   options.find((option) => option.id === id)?.label ?? null
@@ -149,7 +224,7 @@ export function createFinance3EntriesColumns(
   context: Finance3EntriesContext,
   selectable: boolean,
 ): DataTableColumnDef<Finance3Entry>[] {
-  const { format, labels, locale } = context
+  const { labels } = context
   const entryLabels = labels.entries
   const column = (id: Finance3EntryColumnId) => ({
     header: entryLabels.columns[id],
@@ -264,29 +339,13 @@ export function createFinance3EntriesColumns(
     {
       ...column('due'),
       accessorFn: (item) => item.dueOn,
-      cell: ({ row }) => (
-        <DataDate
-          ariaLabel={entryLabels.columns.due}
-          fallback={labels.noValue}
-          locale={locale}
-          overdue={row.original.situation === 'overdue'}
-          timeZone="UTC"
-          value={format.dayValue(row.original.dueOn)}
-          variant="plain"
-        />
-      ),
+      cell: ({ row }) => <DueField context={context} item={row.original} />,
       size: 140,
     },
     {
       ...column('amount'),
       accessorFn: (item) => item.amount,
-      cell: ({ row }) => (
-        <Finance3Amount
-          cents={row.original.amount}
-          direction={finance3KindDirection[row.original.kind]}
-          format={format}
-        />
-      ),
+      cell: ({ row }) => <AmountField context={context} item={row.original} />,
       meta: { align: 'end', label: entryLabels.columns.amount },
       size: 150,
     },

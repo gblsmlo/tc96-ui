@@ -104,6 +104,7 @@ const LedgerPage = ({
                 : current,
           )
         }
+        onOpen={() => undefined}
         onPageChange={setPage}
         onRetry={() => queueQuery.refetch()}
         onSelectedIdsChange={setSelectedIds}
@@ -132,6 +133,8 @@ const LedgerPage = ({
       filtered={Boolean(situationFilter || accountFilter)}
       members={members}
       onAccountChange={(id, accountId) => updateEntries([id], { accountId })}
+      onAmountChange={(id, amount) => updateEntries([id], { amount })}
+      onDueChange={(id, dueOn) => updateEntries([id], { dueOn })}
       onAccountFilterChange={(next) => {
         setAccountFilter(next)
         setPage(1)

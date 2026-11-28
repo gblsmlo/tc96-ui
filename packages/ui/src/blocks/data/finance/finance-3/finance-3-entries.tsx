@@ -58,10 +58,12 @@ export function Finance3Entries({
   locale = defaultFinance3Locale,
   members = noMembers,
   onAccountChange,
+  onAmountChange,
   onAccountFilterChange,
   onBulkResponsibleChange,
   onBulkSettle,
   onCategoryChange,
+  onDueChange,
   onCreate,
   onFeeTypeFilterChange,
   onHiddenColumnsChange,
@@ -145,6 +147,8 @@ export function Finance3Entries({
   )
 
   const changeAccount = useStableHandler(onAccountChange)
+  const changeAmount = useStableHandler(onAmountChange)
+  const changeDue = useStableHandler(onDueChange)
   const changeCategory = useStableHandler(onCategoryChange)
   const changeResponsible = useStableHandler(onResponsibleChange)
   const format = useMemo(
@@ -160,14 +164,18 @@ export function Finance3Entries({
       locale,
       members,
       onAccountChange: changeAccount,
+      onAmountChange: changeAmount,
       onCategoryChange: changeCategory,
+      onDueChange: changeDue,
       onResponsibleChange: changeResponsible,
     }),
     [
       accounts,
       categories,
       changeAccount,
+      changeAmount,
       changeCategory,
+      changeDue,
       changeResponsible,
       format,
       labels,

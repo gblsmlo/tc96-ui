@@ -76,6 +76,7 @@ export interface Legal6Labels
     > {
   allKinds: string
   allOwners: string
+  clearSelection: string
   clientList: (clients: readonly string[]) => string
   columns: Record<Legal6ColumnId, string>
   confirm: string
@@ -92,6 +93,10 @@ export interface Legal6Labels
   savedViews: DataCollectionSavedViewLabels
   savePreference: string
   seeView: (view: string) => string
+  selectAll: string
+  selectDeadline: (label: string, lawsuitTitle: string) => string
+  selectedCount: (count: number) => string
+  selectionActions: string
   sort: string
   sortBy: string
   sorts: Record<Legal6Sort, string>
@@ -130,6 +135,9 @@ export interface Legal6Props
   labels?: Legal6LabelsOverride
   loadingMore?: boolean
   loadMoreError?: boolean
+  onBulkConfirm?: (deadlineIds: string[]) => void
+  onBulkOwnerChange?: (deadlineIds: string[], ownerId: string | null) => void
+  onBulkReject?: (deadlineIds: string[]) => void
   onConfirm?: (deadlineId: string) => void
   onCreate?: () => void
   onKindFilterChange?: (kindId: string | null) => void
@@ -144,6 +152,7 @@ export interface Legal6Props
   onSavedViewSelect?: (savedViewId: string) => void
   onSavedViewUpdate?: () => void
   onSavePreference?: () => void
+  onSelectedIdsChange?: (deadlineIds: string[]) => void
   onSortChange?: (sort: Legal6Sort) => void
   onViewChange?: (view: Legal6View) => void
   ownerFilter?: string | null
@@ -154,7 +163,9 @@ export interface Legal6Props
   savedViews?: Legal6SavedView[]
   savedViewsLoading?: boolean
   savedViewsPending?: boolean
+  selectedIds?: string[]
   sort?: Legal6Sort
+  unassignable?: boolean
   view?: Legal6View
   views?: readonly Legal6View[]
 }

@@ -1,6 +1,10 @@
 import type { DataTableColumnDef } from '@tc96/ui/patterns/data-table/data-table-features'
 import { DataCollectionTitleCell } from '../../shared/collection/data-collection-record-parts'
-import { Finance3Amount, Finance3TextField } from './finance-3-fields'
+import {
+  Finance3Amount,
+  Finance3TextField,
+  finance3AmountName,
+} from './finance-3-fields'
 import {
   type Finance3Formatter,
   finance3SignDirection,
@@ -11,6 +15,9 @@ import type {
   Finance3StatementLine,
   Finance3StatementSummary,
 } from './types'
+
+const statementDirection = (line: Finance3StatementLine) =>
+  line.kind === 'opening' ? 'none' : finance3SignDirection(line.amount)
 
 export interface Finance3StatementContext {
   format: Finance3Formatter
@@ -101,12 +108,14 @@ export function createFinance3StatementColumns({
       cell: ({ row }) => (
         <Finance3Amount
           cents={row.original.amount}
-          direction={
-            row.original.kind === 'opening'
-              ? 'none'
-              : finance3SignDirection(row.original.amount)
-          }
+          direction={statementDirection(row.original)}
           format={format}
+          label={finance3AmountName(
+            labels.amountName,
+            format,
+            row.original.amount,
+            statementDirection(row.original),
+          )}
         />
       ),
       meta: { align: 'end', label: statementLabels.columns.amount },

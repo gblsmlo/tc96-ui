@@ -10,6 +10,7 @@ import {
 } from '../../shared/collection/data-collection'
 import { DataCollectionFrame } from '../../shared/collection/data-collection-frame'
 import { dataCollectionLoadState } from '../../shared/collection/data-collection-load-state'
+import { DataCollectionListHeader } from '../../shared/collection/data-collection-record-parts'
 import { DataCollectionViewSwitcher } from '../../shared/collection/data-collection-view-switcher'
 import {
   useControllable,
@@ -18,7 +19,7 @@ import {
 import { resolveLegal5Labels } from './labels'
 import { createLegal5Columns } from './legal-5-columns'
 import type { Legal5FieldContext } from './legal-5-fields'
-import { legal5Views } from './legal-5-options'
+import { legal5Modes, legal5Views } from './legal-5-options'
 import { renderLegal5ListRow } from './legal-5-records'
 import { createLegal5SelectionActions } from './legal-5-selection-actions'
 import { Legal5Skeleton } from './legal-5-skeleton'
@@ -55,6 +56,7 @@ export function Legal5({
   groupBy: groupByProp,
   labels: labelsProp,
   mode: modeProp,
+  modes = legal5Modes,
   onArchivedFilterChange,
   onBulkArchive,
   onBulkOwnerChange,
@@ -280,6 +282,52 @@ export function Legal5({
     () => Object.fromEntries(selectedIds.map((id) => [id, true as const])),
     [selectedIds],
   )
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
+  const listSelection = useMemo(
+    () =>
+      selectable
+        ? {
+            onSelectedChange: (recordId: string, checked: boolean) =>
+              setSelectedIds(
+                checked
+                  ? [...selectedIds.filter((id) => id !== recordId), recordId]
+                  : selectedIds.filter((id) => id !== recordId),
+              ),
+            selectedIds: selectedSet,
+          }
+        : undefined,
+    [selectable, selectedIds, selectedSet, setSelectedIds],
+  )
+  const selectedRows = useMemo(
+    () => records.filter((item) => selectedSet.has(item.id)),
+    [records, selectedSet],
+  )
+  const allSelected =
+    records.length > 0 && records.every((item) => selectedSet.has(item.id))
+  const clearSelection = () => setSelectedIds(noIds)
+  const selectionBar = (rows: readonly Legal5Record[], clear: () => void) => (
+    <ActionBar
+      actions={createLegal5SelectionActions({
+        labels,
+        onBulkArchive,
+        onBulkOwnerChange,
+        onBulkPhaseChange,
+        onBulkTagAdd,
+        onDone: clear,
+        owners,
+        phases,
+        selectedRows: rows,
+        tags,
+      })}
+      className="pointer-events-auto"
+      clearSelectionLabel={labels.clearSelection}
+      formatSelection={labels.selectedCount}
+      label={labels.selectionActions}
+      onClearSelection={clear}
+      selectedCount={rows.length}
+      selectedRows={rows}
+    />
+  )
   const { table } = useDataTable<Legal5Record>({
     columns,
     data: tableRecords,
@@ -338,6 +386,7 @@ export function Legal5({
           }
           loading={Boolean(loadState)}
           mode={mode}
+          modes={legal5Modes.filter((item) => modes.includes(item))}
           onArchivedFilterChange={
             onArchivedFilterChange ? setArchivedFilter : undefined
           }
@@ -396,6 +445,22 @@ export function Legal5({
           getRowOpenLabel={(item) => labels.openRecord(item.title)}
           groupBy={groupBy}
           label={labels.title}
+          listHeader={
+            selectable && records.length > 0 ? (
+              <DataCollectionListHeader
+                selection={{
+                  checked: allSelected,
+                  indeterminate: selectedSet.size > 0 && !allSelected,
+                  label: labels.selectAll,
+                  onCheckedChange: (checked) =>
+                    setSelectedIds(
+                      checked ? records.map((item) => item.id) : noIds,
+                    ),
+                }}
+                title={labels.columns.title}
+              />
+            ) : undefined
+          }
           mode={mode}
           onCollapsedGroupIdsChange={
             onCollapsedGroupIdsChange
@@ -403,36 +468,21 @@ export function Legal5({
               : undefined
           }
           onOpen={openRecord ? (item) => openRecord(item.id) : undefined}
-          renderListRecord={renderLegal5ListRow(context)}
+          renderListRecord={renderLegal5ListRow(context, listSelection)}
           selectionActions={
             selectable
-              ? ({ clearSelection, selectedCount, selectedRows }) => (
-                  <ActionBar
-                    actions={createLegal5SelectionActions({
-                      labels,
-                      onBulkArchive,
-                      onBulkOwnerChange,
-                      onBulkPhaseChange,
-                      onBulkTagAdd,
-                      onDone: clearSelection,
-                      owners,
-                      phases,
-                      selectedRows,
-                      tags,
-                    })}
-                    clearSelectionLabel={labels.clearSelection}
-                    formatSelection={labels.selectedCount}
-                    label={labels.selectionActions}
-                    onClearSelection={clearSelection}
-                    selectedCount={selectedCount}
-                    selectedRows={selectedRows}
-                  />
-                )
+              ? ({ clearSelection: clear, selectedRows: rows }) =>
+                  selectionBar(rows, clear)
               : undefined
           }
           table={table}
         />
       )}
+      {!loadState && mode === 'list' && selectable ? (
+        <div className="pointer-events-none sticky bottom-3 flex justify-center">
+          {selectionBar(selectedRows, clearSelection)}
+        </div>
+      ) : null}
     </DataCollectionFrame>
   )
 }

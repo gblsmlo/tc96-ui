@@ -9,6 +9,11 @@ const openRecord = (title: string) => `Abrir ${title}`
 export const defaultFinance3Labels: Finance3Labels = {
   ...defaultDataCollectionLoadLabels,
   clearFilters: 'Limpar filtros',
+  amountName: (amount, direction) => {
+    if (direction === 'in') return `Entrada de ${amount}`
+    if (direction === 'out') return `Saída de ${amount}`
+    return amount
+  },
   clearSelection: 'Limpar seleção',
   clientMoney: {
     columns: { amount: 'Saldo', name: 'Cliente' },

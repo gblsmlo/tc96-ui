@@ -1,6 +1,7 @@
 import { Badge } from '@tc96/ui/badge'
 import { Button } from '@tc96/ui/button'
 import type { DataTableColumnDef } from '@tc96/ui/patterns/data-table/data-table-features'
+import { createDataTableSelectColumn } from '@tc96/ui/patterns/data-table/data-table-select-column'
 import { TextProperty } from '@tc96/ui/patterns/properties/display/text/text-property'
 import {
   DataDate,
@@ -25,6 +26,7 @@ export interface Legal8ColumnContext {
   labels: Legal8Labels
   locale?: string
   onOpenFailure?: (failureId: string) => void
+  onOpenRun?: (runId: string) => void
   timeZone?: string
 }
 
@@ -162,6 +164,7 @@ export function createLegal8RunColumns(
 
 export function createLegal8FailureColumns(
   context: Legal8ColumnContext,
+  selectable = false,
 ): DataTableColumnDef<Legal8Failure>[] {
   const { labels, locale, timeZone } = context
   const stateOptions = dataSelectOptions(
@@ -194,6 +197,15 @@ export function createLegal8FailureColumns(
   )
 
   return [
+    ...(selectable
+      ? [
+          createDataTableSelectColumn<Legal8Failure>({
+            getRowLabel: (failure) =>
+              labels.selectFailure(labels.failureKinds[failure.kind]),
+            selectAllLabel: labels.selectAllFailures,
+          }),
+        ]
+      : []),
     {
       ...column('kind'),
       accessorFn: (failure) => failure.kind,

@@ -1,4 +1,5 @@
 import type { DataTableColumnDef } from '@tc96/ui/patterns/data-table/data-table-features'
+import { createDataTableSelectColumn } from '@tc96/ui/patterns/data-table/data-table-select-column'
 import {
   Legal6DateField,
   Legal6DaysLeftField,
@@ -12,6 +13,7 @@ import type { Legal6Deadline } from './types'
 export function createLegal6Columns(
   context: Legal6FieldContext,
   decides: boolean,
+  selectable = false,
 ): DataTableColumnDef<Legal6Deadline>[] {
   const { labels } = context
   const column = (id: keyof typeof labels.columns) => ({
@@ -21,6 +23,15 @@ export function createLegal6Columns(
   })
 
   const columns: DataTableColumnDef<Legal6Deadline>[] = [
+    ...(selectable
+      ? [
+          createDataTableSelectColumn<Legal6Deadline>({
+            getRowLabel: (item) =>
+              labels.selectDeadline(item.label, item.lawsuitTitle),
+            selectAllLabel: labels.selectAll,
+          }),
+        ]
+      : []),
     {
       ...column('deadline'),
       accessorFn: (item) => item.label,

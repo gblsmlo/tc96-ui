@@ -82,27 +82,25 @@ export function DataCollectionSettingsToolbar<
         )
       }
       right={
-        loading ? undefined : (
-          <>
-            {search}
-            <ViewSettings
-              activeFilterCount={activeFilterCount}
-              clearLabel={labels.clearFilters}
-              formatTriggerLabel={labels.filterCount}
-              label={labels.display}
-              mode={mode}
-              modes={viewModes}
-              onClearFilters={onClearFilters}
-              onModeChange={onModeChange}
-              onSavePreference={onSavePreference}
-              savePreferenceDisabled={savePreferenceDisabled}
-              savePreferenceLabel={savePreferenceLabel}
-            >
-              {children}
-            </ViewSettings>
-            {actions}
-          </>
-        )
+        <>
+          {loading ? null : search}
+          <ViewSettings
+            activeFilterCount={activeFilterCount}
+            clearLabel={labels.clearFilters}
+            formatTriggerLabel={labels.filterCount}
+            label={labels.display}
+            mode={mode}
+            modes={viewModes}
+            onClearFilters={onClearFilters}
+            onModeChange={onModeChange}
+            onSavePreference={onSavePreference}
+            savePreferenceDisabled={savePreferenceDisabled}
+            savePreferenceLabel={savePreferenceLabel}
+          >
+            {children}
+          </ViewSettings>
+          {loading ? null : actions}
+        </>
       }
     />
   )

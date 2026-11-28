@@ -4,8 +4,14 @@ import { DataCollectionListRow } from '../../shared/collection/data-collection-r
 import type { Legal7FieldContext } from './legal-7-fields'
 import type { Legal7Publication } from './types'
 
+export interface Legal7ListSelection {
+  onSelectedChange: (publicationId: string, selected: boolean) => void
+  selectedIds: ReadonlySet<string>
+}
+
 export const renderLegal7ListRow =
-  (context: Legal7FieldContext) => (item: Legal7Publication) => {
+  (context: Legal7FieldContext, selection?: Legal7ListSelection) =>
+  (item: Legal7Publication) => {
     const { formatDate, labels, onOpen } = context
     return (
       <DataCollectionListRow
@@ -32,6 +38,19 @@ export const renderLegal7ListRow =
           formatDate(item.availableOn),
           item.tribunal,
         )}
+        selection={
+          selection
+            ? {
+                checked: selection.selectedIds.has(item.id),
+                label: labels.selectPublication(
+                  formatDate(item.availableOn),
+                  item.tribunal,
+                ),
+                onCheckedChange: (checked) =>
+                  selection.onSelectedChange(item.id, checked),
+              }
+            : undefined
+        }
         title={labels.kindAndTribunal(item.kind, item.tribunal)}
       />
     )

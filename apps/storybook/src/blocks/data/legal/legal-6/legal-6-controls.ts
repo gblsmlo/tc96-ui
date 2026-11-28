@@ -6,6 +6,7 @@ import {
 } from '@tc96/ui/blocks/data/legal/legal-6'
 
 export interface Legal6Controls {
+  bulkActions: boolean
   catalogsLoading: boolean
   counts: boolean
   create: string
@@ -22,6 +23,7 @@ export interface Legal6Controls {
 }
 
 export const legal6ControlArgs: Legal6Controls = {
+  bulkActions: true,
   catalogsLoading: false,
   counts: true,
   create: 'Novo prazo',
@@ -38,6 +40,11 @@ export const legal6ControlArgs: Legal6Controls = {
 }
 
 export const legal6ControlArgTypes: Partial<ArgTypes<Legal6Controls>> = {
+  bulkActions: {
+    control: 'boolean',
+    description:
+      'Passes `selectedIds`, `onSelectedIdsChange` and the three bulk callbacks; on, the table has a select column and an action bar with Responsável, Confirmar and Rejeitar (the last two only on Propostos); off, the table has no select column.',
+  },
   catalogsLoading: {
     control: 'boolean',
     description:
