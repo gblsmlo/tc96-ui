@@ -82,6 +82,8 @@ export interface Finance3Entry {
   accountId: string | null
   amount: number
   canEdit?: boolean
+  canEditAmount?: boolean
+  canEditDue?: boolean
   canSettle?: boolean
   categoryId: string | null
   counterpartAccountId?: string | null
@@ -269,6 +271,7 @@ export interface Finance3Labels
       DataCollectionSettingsToolbarLabels,
       'clearFilters' | 'display' | 'filterCount'
     > {
+  amountName: (amount: string, direction: Finance3Direction) => string
   clearSelection: string
   clientMoney: Finance3ClientMoneyLabels
   create: string
@@ -393,9 +396,11 @@ export interface Finance3EntriesProps
   members?: Finance3Person[]
   onAccountChange?: (entryId: string, accountId: string | null) => void
   onAccountFilterChange?: (accountId: string | null) => void
+  onAmountChange?: (entryId: string, amount: number) => void
   onBulkResponsibleChange?: (entryIds: string[], memberId: string) => void
   onBulkSettle?: (entryIds: string[], accountId: string) => void
   onCategoryChange?: (entryId: string, categoryId: string | null) => void
+  onDueChange?: (entryId: string, dueOn: string) => void
   onFeeTypeFilterChange?: (feeType: Finance3FeeType | null) => void
   onHiddenColumnsChange?: (columnIds: Finance3EntryColumnId[]) => void
   onOpen?: (entryId: string) => void
@@ -420,6 +425,7 @@ export interface Finance3ReceivablesProps
   onContact?: (receivableId: string) => void
   onIssueCharge?: (receivableId: string) => void
   onMarkCollected?: (receivableIds: string[]) => void
+  onOpen?: (entryId: string) => void
   onReissueCharge?: (receivableId: string) => void
   records: Finance3Receivable[]
   truncated?: boolean

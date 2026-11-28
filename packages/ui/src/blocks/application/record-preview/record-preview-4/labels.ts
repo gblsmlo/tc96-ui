@@ -1,3 +1,4 @@
+import { mergeRecordPreviewLabels } from '../shared/merge-labels'
 import type {
   RecordPreview4Labels,
   RecordPreview4LabelsOverride,
@@ -9,6 +10,7 @@ export const defaultRecordPreview4Labels: RecordPreview4Labels = {
   copyId: 'Copy ID',
   copyNumber: 'Copy number',
   expand: 'Open full screen',
+  fallbackTitle: 'Lawsuit',
   fields: {
     actionClass: 'Action',
     caseNumber: 'Number',
@@ -49,6 +51,15 @@ export const defaultRecordPreview4Labels: RecordPreview4Labels = {
   noVenue: 'No venue',
   notInformed: 'Not informed',
   select: {},
+  status: {
+    errorDescription: 'Close the details and try again.',
+    errorTitle: 'The lawsuit could not be loaded',
+    loading: 'Loading the lawsuit',
+    notFoundDescription:
+      'It may have been deleted or you may no longer have access.',
+    notFoundTitle: 'Lawsuit not found',
+    retry: 'Try again',
+  },
   tagPicker: {},
   tagsPlaceholder: 'Add a tag',
   text: {},
@@ -57,11 +68,9 @@ export const defaultRecordPreview4Labels: RecordPreview4Labels = {
 export function resolveRecordPreview4Labels(
   labels?: RecordPreview4LabelsOverride,
 ): RecordPreview4Labels {
-  const base = defaultRecordPreview4Labels
-  return {
-    ...base,
-    ...labels,
-    fields: { ...base.fields, ...labels?.fields },
-    groups: { ...base.groups, ...labels?.groups },
-  }
+  return mergeRecordPreviewLabels(defaultRecordPreview4Labels, labels, [
+    'fields',
+    'groups',
+    'status',
+  ])
 }

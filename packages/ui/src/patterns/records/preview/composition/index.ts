@@ -1,3 +1,6 @@
 export * from './record-preview/index'
-export * from './record-preview-action/index'
 export * from './record-preview-body/index'
+export * from './record-preview-cover/index'
+export * from './record-preview-decisions/index'
+export * from './record-preview-frame/index'
+export * from './record-preview-register/index'

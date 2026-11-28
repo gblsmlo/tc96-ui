@@ -5,6 +5,10 @@ import type {
   TextPropertyLabels,
 } from '@tc96/ui/patterns/properties/core'
 import type { PersonPropertyOption } from '@tc96/ui/patterns/properties/display/person/person-option-content'
+import type {
+  RecordPreviewStatus,
+  RecordPreviewStatusLabels,
+} from '@tc96/ui/patterns/records/preview/core'
 
 export type RecordPreview4Person = PersonPropertyOption
 
@@ -120,6 +124,7 @@ export interface RecordPreview4Labels {
   copyId: string
   copyNumber: string
   expand: string
+  fallbackTitle: string
   fields: Record<RecordPreview4Field, string>
   groups: Record<RecordPreview4Group, string>
   noAction: string
@@ -136,16 +141,18 @@ export interface RecordPreview4Labels {
   noVenue: string
   notInformed: string
   select: Partial<SelectPropertyLabels>
+  status: RecordPreviewStatusLabels
   tagPicker: Partial<TagsPropertyLabels>
   tagsPlaceholder: string
   text: Partial<TextPropertyLabels>
 }
 
 export type RecordPreview4LabelsOverride = Partial<
-  Omit<RecordPreview4Labels, 'fields' | 'groups'>
+  Omit<RecordPreview4Labels, 'fields' | 'groups' | 'status'>
 > & {
   fields?: Partial<RecordPreview4Labels['fields']>
   groups?: Partial<RecordPreview4Labels['groups']>
+  status?: Partial<RecordPreview4Labels['status']>
 }
 
 export interface RecordPreview4Props {
@@ -160,9 +167,13 @@ export interface RecordPreview4Props {
   onExpand?: () => void
   onOpenChange: (open: boolean) => void
   onRecordChange: (changes: RecordPreview4Changes) => void
+  onRetry?: () => void
   open: boolean
   people: readonly RecordPreview4Person[]
-  record: RecordPreview4Record
+  readOnly?: boolean
+  readOnlyFields?: readonly RecordPreview4Field[]
+  record: RecordPreview4Record | null
+  status?: RecordPreviewStatus
   tags: readonly PropertyOption[]
   timeZone?: string
 }

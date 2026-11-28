@@ -7,6 +7,7 @@ import {
   CollapsiblePanel,
   CollapsibleTrigger,
 } from '@tc96/ui/collapsible'
+import { Skeleton } from '@tc96/ui/skeleton'
 import { cn } from '@tc96/utils'
 import { type ReactElement, type ReactNode, useId, useState } from 'react'
 import type { RecordGroupProps } from '../../core'
@@ -15,10 +16,19 @@ import {
   recordGroupContentVariants,
   recordGroupHeaderClassName,
   recordGroupPanelClassName,
+  recordGroupRowLabelVariants,
+  recordGroupRowValueVariants,
+  recordGroupRowVariants,
   recordGroupShellClassName,
   recordGroupTitleVariants,
   recordGroupTriggerVariants,
 } from '../../lib/variants'
+
+const loadingRows = [
+  { id: 'first', value: 'w-full' },
+  { id: 'second', value: 'w-full' },
+  { id: 'third', value: 'w-2/3' },
+] as const
 
 const chevronIcon = (
   <CaretDownIcon
@@ -37,6 +47,8 @@ export function RecordGroup({
   defaultOpen = true,
   empty = false,
   footer,
+  loading = false,
+  loadingLabel,
   onOpenChange,
   open,
   title,
@@ -55,10 +67,33 @@ export function RecordGroup({
 
   const content = (
     <div
-      className={recordGroupContentVariants({ empty, variant })}
+      className={recordGroupContentVariants({
+        empty: empty && !loading,
+        variant,
+      })}
       data-slot="record-group-content"
     >
-      {children}
+      {loading ? (
+        <output
+          aria-busy="true"
+          aria-label={loadingLabel}
+          className="flex flex-col"
+          data-slot="record-group-loading"
+        >
+          {loadingRows.map((row) => (
+            <span className={recordGroupRowVariants()} key={row.id}>
+              <span className={recordGroupRowLabelVariants()}>
+                <Skeleton aria-hidden className="h-4 w-20" />
+              </span>
+              <span className={recordGroupRowValueVariants()}>
+                <Skeleton aria-hidden className={cn('h-4', row.value)} />
+              </span>
+            </span>
+          ))}
+        </output>
+      ) : (
+        children
+      )}
     </div>
   )
 
@@ -119,7 +154,7 @@ export function RecordGroup({
       ) : (
         content
       )}
-      {footer ? (
+      {footer && !loading ? (
         <div className="py-2" data-slot="record-group-footer">
           {footer}
         </div>
@@ -137,6 +172,7 @@ export function RecordGroup({
   if (!collapsible)
     return (
       <section
+        aria-busy={loading ? 'true' : undefined}
         aria-labelledby={labelledBy}
         className={recordGroupClassName(variant, className)}
         data-empty={empty ? 'true' : undefined}
@@ -154,6 +190,7 @@ export function RecordGroup({
 
   return (
     <Collapsible
+      aria-busy={loading ? 'true' : undefined}
       aria-labelledby={labelledBy}
       className={recordGroupClassName(variant, className)}
       data-empty={empty ? 'true' : undefined}

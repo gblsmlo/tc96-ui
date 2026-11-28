@@ -9,6 +9,8 @@ const meta = {
     failures,
     nextSweepAt,
     onOpenFailure: fn(),
+    onOpenRun: fn(),
+    onResolveFailures: fn(),
     onRun: fn(),
     onViewChange: fn(),
     runs,

@@ -24,7 +24,6 @@ import { DataCollectionToolbarButton } from '../../shared/collection/data-collec
 import {
   legal5ArchivedChoices,
   legal5Groupings,
-  legal5Modes,
   legal5Poles,
   legal5SituationChoices,
   legal5Sorts,
@@ -52,6 +51,7 @@ export interface Legal5ToolbarProps {
   left: ReactNode
   loading: boolean
   mode: Legal5Mode
+  modes: readonly Legal5Mode[]
   onArchivedFilterChange?: (archived: Legal5Archived | null) => void
   onClientFilterChange: (clientId: string | null) => void
   onCreate?: () => void
@@ -120,6 +120,7 @@ export function Legal5Toolbar({
   left,
   loading,
   mode,
+  modes,
   onArchivedFilterChange,
   onClientFilterChange,
   onCreate,
@@ -194,7 +195,7 @@ export function Legal5Toolbar({
       loading={loading}
       mode={mode}
       modeLabels={labels.modes}
-      modes={legal5Modes}
+      modes={modes}
       onClearFilters={() => {
         if (showSearch && search) onSearchChange?.('')
         if (showPhase) onPhaseFilterChange([])

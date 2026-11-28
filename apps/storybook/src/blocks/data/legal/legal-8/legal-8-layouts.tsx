@@ -23,7 +23,9 @@ export interface ComposedLegal8Props
   extends Legal8Controls,
     LegalSavedViewCallbacks {
   onOpenFailure?: Legal8Props['onOpenFailure']
+  onOpenRun?: Legal8Props['onOpenRun']
   onOriginFilterChange?: Legal8Props['onOriginFilterChange']
+  onResolveFailures?: Legal8Props['onResolveFailures']
   onRun?: Legal8Props['onRun']
   onSortChange?: Legal8Props['onSortChange']
   onViewChange?: Legal8Props['onViewChange']
@@ -34,10 +36,13 @@ const noop = () => undefined
 const counts = { failures: failures.length, runs: runs.length }
 
 export const ComposedLegal8 = ({
+  bulkActions,
   counted,
   empty,
   onOpenFailure,
+  onOpenRun,
   onOriginFilterChange,
+  onResolveFailures,
   onRun,
   onSavedViewCreate,
   onSavedViewDelete,
@@ -59,6 +64,8 @@ export const ComposedLegal8 = ({
   view: viewControl,
 }: Readonly<ComposedLegal8Props>) => {
   const [view, setView] = useState<Legal8View>(viewControl)
+  const [items, setItems] = useState(failures)
+  const [selectedFailureIds, setSelectedFailureIds] = useState<string[]>([])
   const [sort, setSort] = useState<Legal8Sort>('newest')
   const [originFilter, setOriginFilter] = useState<Legal8FailureOrigin | null>(
     null,
@@ -93,15 +100,33 @@ export const ComposedLegal8 = ({
     <Legal8
       {...(withSavedViews ? views.props : {})}
       counts={counted ? counts : undefined}
-      failures={empty ? [] : failures}
+      failures={empty ? [] : items}
       labels={labels}
       nextSweepAt={scheduled ? nextSweepAt : null}
       onOpenFailure={openable ? (onOpenFailure ?? noop) : undefined}
+      onOpenRun={openable ? (onOpenRun ?? noop) : undefined}
       onOriginFilterChange={(next) => {
         setOriginFilter(next)
         onOriginFilterChange?.(next)
       }}
+      onResolveFailures={
+        bulkActions
+          ? (ids) => {
+              setItems((current) =>
+                current.map((item) =>
+                  ids.includes(item.id)
+                    ? { ...item, state: 'resolved' as const }
+                    : item,
+                ),
+              )
+              onResolveFailures?.(ids)
+            }
+          : undefined
+      }
       onRun={runnable ? (onRun ?? noop) : undefined}
+      onSelectedFailureIdsChange={
+        bulkActions ? setSelectedFailureIds : undefined
+      }
       onSortChange={(next) => {
         setSort(next)
         onSortChange?.(next)
@@ -115,6 +140,7 @@ export const ComposedLegal8 = ({
       runError={runError}
       running={running}
       runs={empty ? [] : runs}
+      selectedFailureIds={bulkActions ? selectedFailureIds : undefined}
       sort={sort}
       stoppedSince={stopped ? stoppedSince : null}
       view={view}

@@ -11,7 +11,7 @@ The toolbar shows `labels.title` as the only `h2` and Exibição: the mode tabs,
 
 The block renders what it gets. It never filters, sorts or pages `publications`: sort, filters and page are value and callback pairs, and the consumer answers each callback with the records of that page, as a server does. Without a value the block keeps the choice locally and still calls the callback. `wait` and each item of `lawyers` arrive as ready text; the block computes no days.
 
-Selecting rows in the Tabela opens the `ActionBar` pattern. One selected publication with a lawsuit offers Criar prazo, Vincular a prazo and Sem prazo; one without a lawsuit offers Cadastrar processo and Vincular a um processo; either case adds Criar tarefa and Descartar. Several selected publications offer Vincular a um processo and Descartar, both disabled while any of them already has a lawsuit; the bar then shows `labels.bulkHint` as its `notice`, above the toolbar. An action renders only when its callback is passed, and the dialogs those actions open belong to the consumer.
+Selecting rows opens the `ActionBar` pattern. The Tabela always has the select column; the Lista has a checkbox on each row and a select-all checkbox in its header once `selectedIds`, `onSelectedIdsChange` or an action callback is passed, and the bar then sits at the bottom of the block. One selected publication with a lawsuit offers Criar prazo, Vincular a prazo and Sem prazo; one without a lawsuit offers Cadastrar processo and Vincular a um processo; either case adds Criar tarefa and Descartar. Several selected publications offer Vincular a um processo and Descartar, both disabled while any of them already has a lawsuit; the bar then shows `labels.bulkHint` as its `notice`, above the toolbar. An action renders only when its callback is passed, and the dialogs those actions open belong to the consumer.
 
 The other pages of `Blocks/Data/Legal/Legal7`: [Playground](?path=/story/blocks-data-legal-legal7-playground--playground), [Layouts](?path=/story/blocks-data-legal-legal7-layouts--default), [Behavior](?path=/story/blocks-data-legal-legal7-behavior--the-heading-names-the-section) and [Usages](?path=/story/blocks-data-legal-legal7-usages--loaded).
 
@@ -65,7 +65,7 @@ import { Legal7 } from '@tc96/ui/blocks/data/legal/legal-7'
 | `filtered` | `boolean` | a filter is set | Chooses the empty message: `labels.noResult` when true, `labels.empty` otherwise. |
 | `page`, `onPageChange` | `number`, `(page) => void` | `1` | The controllable page, starting at 1. |
 | `pageCount`, `pageSize`, `total` | `number` | `1`, -, `0` | The pagination values. The pagination renders only when `total` is above zero; the range text needs `pageSize`. |
-| `selectedIds`, `onSelectedIdsChange` | `string[]`, `(publicationIds) => void` | `[]` | The controllable row selection of the Tabela. |
+| `selectedIds`, `onSelectedIdsChange` | `string[]`, `(publicationIds) => void` | `[]` | The controllable row selection of the Tabela and, with this prop, `onSelectedIdsChange` or an action callback, of the Lista. |
 | `onCreateDeadline`, `onLinkDeadline`, `onNoDeadline` | `(publicationId: string) => void` | - | The actions of one selected publication that has a lawsuit. |
 | `onCreateLawsuit` | `(publicationId: string) => void` | - | Cadastrar processo, for one selected publication without a lawsuit. |
 | `onLinkLawsuit` | `(publicationIds: string[]) => void` | - | Vincular a um processo, for one or several publications without a lawsuit. |

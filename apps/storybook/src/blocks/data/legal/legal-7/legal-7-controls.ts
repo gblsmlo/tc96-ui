@@ -40,7 +40,7 @@ export const legal7ControlArgTypes: Partial<ArgTypes<Legal7Controls>> = {
   mode: {
     control: 'inline-radio',
     description:
-      'The active layout; the mode tabs of Exibição change it too and call `onModeChange`.',
+      'The active layout; the mode tabs of Exibição change it too and call `onModeChange`. The Lista has a checkbox per row, a select-all checkbox and the same action bar as the Tabela.',
     options: ['table', 'list'],
   },
   openable: {

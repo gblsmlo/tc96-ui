@@ -9,12 +9,30 @@ export interface Finance3Formatter {
   amount: (cents: number, direction?: Finance3Direction) => string
   day: (day: string) => string
   dayValue: (day: string) => string
+  parseAmount: (text: string) => number | null
 }
 
 const signedCents = (cents: number, direction: Finance3Direction) => {
   if (direction === 'in') return Math.abs(cents)
   if (direction === 'out') return -Math.abs(cents)
   return cents
+}
+
+export function parseFinance3Amount(
+  text: string,
+  locale: string,
+): number | null {
+  const decimal =
+    new Intl.NumberFormat(locale)
+      .formatToParts(1.1)
+      .find((part) => part.type === 'decimal')?.value ?? '.'
+  const digits = [...text]
+    .filter((char) => /[0-9]/.test(char) || char === decimal)
+    .join('')
+    .replace(decimal, '.')
+  if (!/[0-9]/.test(digits)) return null
+  const value = Number(digits)
+  return Number.isFinite(value) ? Math.round(value * 100) : null
 }
 
 export function createFinance3Formatter({
@@ -29,11 +47,12 @@ export function createFinance3Formatter({
         locale,
         maximumFractionDigits: 2,
         minimumFractionDigits: 2,
-        signDisplay: direction === 'none' ? 'auto' : 'exceptZero',
+        signDisplay: 'auto',
         style: 'currency',
       }),
     day: (day) => formatNumericDate(new Date(dayValue(day)), locale, 'UTC'),
     dayValue,
+    parseAmount: (text) => parseFinance3Amount(text, locale),
   }
 }
 

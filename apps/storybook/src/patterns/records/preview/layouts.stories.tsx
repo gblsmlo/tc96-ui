@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { recordPreviewControlArgs } from './record-preview-controls.ts'
 import { ComposedRecordPreview } from './record-preview-layouts.tsx'
+import { ComposedRecordPreviewParts } from './record-preview-parts.tsx'
 
 const meta = {
   tags: ['!autodocs'],
@@ -15,8 +16,9 @@ export const TitleOnly: Story = {
   render: () => (
     <ComposedRecordPreview
       {...recordPreviewControlArgs}
-      actions={false}
       description=""
+      expand={false}
+      more={false}
     />
   ),
 }
@@ -33,6 +35,22 @@ export const LongContent: Story = {
   render: () => (
     <ComposedRecordPreview {...recordPreviewControlArgs} footer longContent />
   ),
+}
+
+export const Frame: Story = {
+  render: () => <ComposedRecordPreviewParts part="frame" />,
+}
+
+export const Cover: Story = {
+  render: () => <ComposedRecordPreviewParts part="cover" />,
+}
+
+export const Register: Story = {
+  render: () => <ComposedRecordPreviewParts part="register" />,
+}
+
+export const Decisions: Story = {
+  render: () => <ComposedRecordPreviewParts part="decisions" />,
 }
 
 export const LongTitle: Story = {

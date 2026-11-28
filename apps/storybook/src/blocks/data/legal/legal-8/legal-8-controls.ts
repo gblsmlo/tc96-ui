@@ -2,6 +2,7 @@ import type { ArgTypes } from '@storybook/react-vite'
 import type { Legal8View } from '@tc96/ui/blocks/data/legal/legal-8'
 
 export interface Legal8Controls {
+  bulkActions: boolean
   counted: boolean
   empty: boolean
   openable: boolean
@@ -16,6 +17,7 @@ export interface Legal8Controls {
 }
 
 export const legal8ControlArgs: Legal8Controls = {
+  bulkActions: true,
   counted: true,
   empty: false,
   openable: true,
@@ -30,6 +32,11 @@ export const legal8ControlArgs: Legal8Controls = {
 }
 
 export const legal8ControlArgTypes: Partial<ArgTypes<Legal8Controls>> = {
+  bulkActions: {
+    control: 'boolean',
+    description:
+      'Passes `selectedFailureIds`, `onSelectedFailureIdsChange` and `onResolveFailures`; on, the Falhas table has a select column and an action bar with Resolver; off, it has no select column.',
+  },
   counted: {
     control: 'boolean',
     description:
@@ -43,7 +50,7 @@ export const legal8ControlArgTypes: Partial<ArgTypes<Legal8Controls>> = {
   openable: {
     control: 'boolean',
     description:
-      'Passes `onOpenFailure`; on, a failure row opens and a run with a failure shows Ver falha.',
+      'Passes `onOpenFailure` and `onOpenRun`; on, a failure row and a run row open and a run with a failure shows Ver falha.',
   },
   runError: {
     control: 'boolean',

@@ -24,6 +24,9 @@ import type { Legal6Controls } from './legal-6-controls.ts'
 export interface ComposedLegal6Props
   extends Legal6Controls,
     LegalSavedViewCallbacks {
+  onBulkConfirm?: Legal6Props['onBulkConfirm']
+  onBulkOwnerChange?: Legal6Props['onBulkOwnerChange']
+  onBulkReject?: Legal6Props['onBulkReject']
   onConfirm?: Legal6Props['onConfirm']
   onCreate?: Legal6Props['onCreate']
   onKindFilterChange?: Legal6Props['onKindFilterChange']
@@ -39,6 +42,7 @@ const noop = () => undefined
 const noDeadlines: Legal6QueueDeadline[] = []
 
 export const ComposedLegal6 = ({
+  bulkActions,
   catalogsLoading,
   counts: countsControl,
   create,
@@ -48,6 +52,9 @@ export const ComposedLegal6 = ({
   headerActions,
   loadMoreError,
   manager,
+  onBulkConfirm,
+  onBulkOwnerChange,
+  onBulkReject,
   onConfirm,
   onCreate,
   onKindFilterChange,
@@ -75,6 +82,7 @@ export const ComposedLegal6 = ({
   const [ownerFilter, setOwnerFilter] = useState<string | null>(null)
   const [kindFilter, setKindFilter] = useState<string | null>(null)
   const [pages, setPages] = useState(1)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const labels = useMemo(() => ({ create, title }), [create, title])
   const views = useLocalSavedViews(
     savedViews,
@@ -120,6 +128,8 @@ export const ComposedLegal6 = ({
 
   const decide = (id: string) =>
     setSource((current) => current.filter((item) => item.id !== id))
+  const decideMany = (ids: readonly string[]) =>
+    setSource((current) => current.filter((item) => !ids.includes(item.id)))
   const restart = () => setPages(1)
 
   return (
@@ -143,6 +153,34 @@ export const ComposedLegal6 = ({
       kindsLoading={catalogsLoading}
       labels={labels}
       loadMoreError={loadMoreError}
+      onBulkConfirm={
+        bulkActions
+          ? (ids) => {
+              decideMany(ids)
+              onBulkConfirm?.(ids)
+            }
+          : undefined
+      }
+      onBulkOwnerChange={
+        bulkActions
+          ? (ids, ownerId) => {
+              setSource((current) =>
+                current.map((item) =>
+                  ids.includes(item.id) ? { ...item, ownerId } : item,
+                ),
+              )
+              onBulkOwnerChange?.(ids, ownerId)
+            }
+          : undefined
+      }
+      onBulkReject={
+        bulkActions
+          ? (ids) => {
+              decideMany(ids)
+              onBulkReject?.(ids)
+            }
+          : undefined
+      }
       onConfirm={
         decides
           ? (id) => {
@@ -175,6 +213,7 @@ export const ComposedLegal6 = ({
             }
           : undefined
       }
+      onSelectedIdsChange={bulkActions ? setSelectedIds : undefined}
       onSortChange={(next) => {
         setSort(next)
         restart()
@@ -189,6 +228,7 @@ export const ComposedLegal6 = ({
       ownerFilter={ownerFilter}
       owners={owners}
       ownersLoading={catalogsLoading}
+      selectedIds={bulkActions ? selectedIds : undefined}
       sort={sort}
       view={view}
       views={manager ? undefined : memberViews}

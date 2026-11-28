@@ -7,6 +7,10 @@ import type {
   TagsPropertyLabels,
 } from '@tc96/ui/patterns/properties/core'
 import type { PersonPropertyOption } from '@tc96/ui/patterns/properties/display/person/person-option-content'
+import type {
+  RecordPreviewStatus,
+  RecordPreviewStatusLabels,
+} from '@tc96/ui/patterns/records/preview/core'
 
 export type RecordPreview1Person = PersonPropertyOption
 
@@ -33,6 +37,7 @@ export interface RecordPreview1Record {
   description?: string | null
   due: string | null
   id: string
+  overdue?: boolean
   priority: string | null
   schedule: ScheduleValue
   status: string | null
@@ -40,12 +45,20 @@ export interface RecordPreview1Record {
   title: string
   type: string | null
   updatedAt: string
+  visibility?: string | null
 }
 
 export type RecordPreview1Changes = Partial<
   Pick<
     RecordPreview1Record,
-    'assignee' | 'due' | 'priority' | 'schedule' | 'status' | 'tags' | 'type'
+    | 'assignee'
+    | 'due'
+    | 'priority'
+    | 'schedule'
+    | 'status'
+    | 'tags'
+    | 'type'
+    | 'visibility'
   >
 >
 
@@ -61,6 +74,7 @@ export type RecordPreview1Field =
   | 'tags'
   | 'type'
   | 'updatedAt'
+  | 'visibility'
 
 export type RecordPreview1Group = 'properties' | 'record' | 'schedule'
 
@@ -69,21 +83,25 @@ export interface RecordPreview1Labels {
   copyId: string
   date: Partial<DatePropertyLabels>
   expand: string
+  fallbackTitle: string
   fields: Record<RecordPreview1Field, string>
   groups: Record<RecordPreview1Group, string>
   noAssignee: string
   noCreator: string
   schedule: Partial<SchedulePropertyLabels>
   select: Partial<SelectPropertyLabels>
+  status: RecordPreviewStatusLabels
   tagPicker: Partial<TagsPropertyLabels>
   tagsPlaceholder: string
+  visibilityPlaceholder: string
 }
 
 export type RecordPreview1LabelsOverride = Partial<
-  Omit<RecordPreview1Labels, 'fields' | 'groups'>
+  Omit<RecordPreview1Labels, 'fields' | 'groups' | 'status'>
 > & {
   fields?: Partial<RecordPreview1Labels['fields']>
   groups?: Partial<RecordPreview1Labels['groups']>
+  status?: Partial<RecordPreview1Labels['status']>
 }
 
 export interface RecordPreview1Props {
@@ -97,7 +115,10 @@ export interface RecordPreview1Props {
   onRecordChange: (changes: RecordPreview1Changes) => void
   open: boolean
   people: readonly RecordPreview1Person[]
-  record: RecordPreview1Record
+  onRetry?: () => void
+  record: RecordPreview1Record | null
+  status?: RecordPreviewStatus
   timeZone?: string
   today?: Date
+  visibilities?: readonly PropertyOption[]
 }

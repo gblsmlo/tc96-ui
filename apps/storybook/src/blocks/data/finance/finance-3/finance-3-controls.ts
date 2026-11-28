@@ -48,7 +48,7 @@ export const finance3ControlArgTypes: Partial<ArgTypes<Finance3Controls>> = {
   editable: {
     control: 'boolean',
     description:
-      'Passes `onResponsibleChange`, `onAccountChange` and `onCategoryChange`; on, those cells are editable in the rows with `canEdit`.',
+      'Passes `onResponsibleChange`, `onAccountChange`, `onCategoryChange`, `onDueChange` and `onAmountChange`; on, those cells are editable in the rows with `canEdit` (the amount also follows `canEditAmount`).',
   },
   empty: {
     control: 'boolean',
@@ -62,7 +62,7 @@ export const finance3ControlArgTypes: Partial<ArgTypes<Finance3Controls>> = {
   openable: {
     control: 'boolean',
     description:
-      'Passes `onOpen`; on, a row opens the entry (Lançamentos, an Extrato line with an entry) or the client (Dinheiro de clientes).',
+      'Passes `onOpen`; on, a row opens the entry (Lançamentos, A cobrar, an Extrato line with an entry) or the client (Dinheiro de clientes).',
   },
   paginated: {
     control: 'boolean',

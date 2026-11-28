@@ -37,7 +37,7 @@ export const legal5ControlArgTypes: Partial<ArgTypes<Legal5Controls>> = {
   bulkActions: {
     control: 'boolean',
     description:
-      'Passes `onSelectedIdsChange` and the four bulk callbacks; off, the table has no select column and no action bar.',
+      'Passes `onSelectedIdsChange` and the four bulk callbacks; off, neither the Tabela nor the Lista has a select column and no action bar shows.',
   },
   catalogsLoading: {
     control: 'boolean',

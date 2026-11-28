@@ -29,6 +29,7 @@ export function ComposedRecordGroup({
   empty,
   footer,
   leading,
+  loading,
   onAction,
   title,
   variant,
@@ -56,6 +57,8 @@ export function ComposedRecordGroup({
         footer ? <Button variant="ghost">View history</Button> : undefined
       }
       key={`${defaultOpen}-${empty}`}
+      loading={loading}
+      loadingLabel="Loading the details"
       title={title}
       variant={variant}
     >

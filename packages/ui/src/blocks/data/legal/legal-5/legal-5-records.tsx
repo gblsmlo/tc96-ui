@@ -12,9 +12,15 @@ import {
 } from './legal-5-fields'
 import type { Legal5Record } from './types'
 
+export interface Legal5ListSelection {
+  onSelectedChange: (recordId: string, selected: boolean) => void
+  selectedIds: ReadonlySet<string>
+}
+
 export const renderLegal5ListRow =
-  (context: Legal5FieldContext) => (item: Legal5Record) => {
-    const { onOpen } = context
+  (context: Legal5FieldContext, selection?: Legal5ListSelection) =>
+  (item: Legal5Record) => {
+    const { labels, onOpen } = context
     return (
       <DataCollectionListRow
         actions={
@@ -37,6 +43,16 @@ export const renderLegal5ListRow =
           ) : undefined
         }
         onOpen={onOpen ? () => onOpen(item.id) : undefined}
+        selection={
+          selection
+            ? {
+                checked: selection.selectedIds.has(item.id),
+                label: labels.selectRecord(item.title),
+                onCheckedChange: (checked) =>
+                  selection.onSelectedChange(item.id, checked),
+              }
+            : undefined
+        }
         title={item.title}
       />
     )

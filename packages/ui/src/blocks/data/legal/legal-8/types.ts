@@ -71,6 +71,7 @@ export interface Legal8Labels
   extends DataCollectionLoadLabels,
     DataCollectionSettingsToolbarLabels {
   allOrigins: string
+  clearSelection: string
   failureColumns: Record<Legal8FailureColumnId, string>
   failureKinds: Record<Legal8FailureKind, string>
   failureOrigins: Record<Legal8FailureOrigin, string>
@@ -81,7 +82,9 @@ export interface Legal8Labels
   noValue: string
   openFailure: string
   openFailureRow: (kind: string) => string
+  openRunRow: (kind: string) => string
   origin: string
+  resolve: string
   retryNow: string
   runColumns: Record<Legal8RunColumnId, string>
   runFailed: string
@@ -91,6 +94,10 @@ export interface Legal8Labels
   runsEmpty: string
   savedViews: DataCollectionSavedViewLabels
   savePreference: string
+  selectAllFailures: string
+  selectedCount: (count: number) => string
+  selectFailure: (kind: string) => string
+  selectionActions: string
   simulated: string
   sort: string
   sortBy: string
@@ -129,7 +136,9 @@ export interface Legal8Props
   labels?: Legal8LabelsOverride
   nextSweepAt?: string | null
   onOpenFailure?: (failureId: string) => void
+  onOpenRun?: (runId: string) => void
   onOriginFilterChange?: (origin: Legal8FailureOrigin | null) => void
+  onResolveFailures?: (failureIds: string[]) => void
   onRun?: () => void
   onSavedViewCreate?: () => void
   onSavedViewDelete?: (savedViewId: string) => void
@@ -138,6 +147,7 @@ export interface Legal8Props
   onSavedViewSelect?: (savedViewId: string) => void
   onSavedViewUpdate?: () => void
   onSavePreference?: () => void
+  onSelectedFailureIdsChange?: (failureIds: string[]) => void
   onSortChange?: (sort: Legal8Sort) => void
   onViewChange?: (view: Legal8View) => void
   originFilter?: Legal8FailureOrigin | null
@@ -149,6 +159,8 @@ export interface Legal8Props
   savedViews?: Legal8SavedView[]
   savedViewsLoading?: boolean
   savedViewsPending?: boolean
+  selectedFailureIds?: string[]
+  showStatus?: boolean
   sort?: Legal8Sort
   stoppedSince?: string | null
   view?: Legal8View

@@ -7,10 +7,12 @@ import {
 import {
   Legal5,
   type Legal5Mode,
+  type Legal5Props,
   type Legal5Record,
   type Legal5View,
 } from '@tc96/ui/blocks/data/legal/legal-5'
 import { useState } from 'react'
+import { expect, fn, userEvent, within } from 'storybook/test'
 import { fetchJson } from '../../../../mocks/api.ts'
 import { legal5Handlers } from '../../../../mocks/legal-5.ts'
 import {
@@ -24,9 +26,16 @@ import {
 } from '../fixtures/legal-5.ts'
 import { useSavedViewsQuery } from '../legal-saved-views.ts'
 
-const LawFirmRecords = () => {
+interface LawFirmRecordsProps extends Pick<Legal5Props, 'onBulkArchive'> {
+  initialMode?: Legal5Mode
+}
+
+const LawFirmRecords = ({
+  initialMode = 'table',
+  onBulkArchive,
+}: Readonly<LawFirmRecordsProps>) => {
   const queryClient = useQueryClient()
-  const [mode, setMode] = useState<Legal5Mode>('table')
+  const [mode, setMode] = useState<Legal5Mode>(initialMode)
   const [view, setView] = useState<Legal5View>('all')
   const [search, setSearch] = useState('')
   const [ownerFilter, setOwnerFilter] = useState<string | null>(null)
@@ -80,6 +89,10 @@ const LawFirmRecords = () => {
       error={isError}
       filtered={Boolean(search || ownerFilter || phaseFilter.length)}
       mode={mode}
+      onBulkArchive={(ids) => {
+        onBulkArchive?.(ids)
+        update(ids, { archived: true })
+      }}
       onBulkOwnerChange={(ids, ownerId) => update(ids, { ownerId })}
       onBulkPhaseChange={(ids, phaseId) => update(ids, { phaseId })}
       onModeChange={setMode}
@@ -139,6 +152,38 @@ type Story = StoryObj<typeof meta>
 export const Loaded: Story = {
   beforeEach: ({ msw }) => {
     msw.use(legal5Handlers.loaded, ...legal5Handlers.savedViews())
+  },
+}
+
+export const ListSelection: Story = {
+  args: { initialMode: 'list', onBulkArchive: fn() },
+  beforeEach: ({ msw }) => {
+    msw.use(legal5Handlers.loaded, ...legal5Handlers.savedViews())
+  },
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(
+      await canvas.findByRole('checkbox', {
+        name: 'Selecionar Ação de cobrança contra fornecedor de farinha',
+      }),
+    )
+    await userEvent.click(
+      canvas.getByRole('checkbox', {
+        name: 'Selecionar Reclamação trabalhista de ex-motorista',
+      }),
+    )
+
+    const bar = within(
+      await canvas.findByRole('toolbar', {
+        name: 'Ações dos processos selecionados',
+      }),
+    )
+    await expect(bar.getByText('2 selecionados')).toBeVisible()
+    await userEvent.click(bar.getByRole('button', { name: 'Arquivar' }))
+    await expect(args.onBulkArchive).toHaveBeenCalledWith([
+      'proc-501',
+      'proc-502',
+    ])
   },
 }
 

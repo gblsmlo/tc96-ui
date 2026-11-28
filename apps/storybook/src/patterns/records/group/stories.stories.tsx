@@ -56,6 +56,10 @@ export const Empty: Story = {
   args: { empty: true },
 }
 
+export const Loading: Story = {
+  args: { loading: true },
+}
+
 export const NotCollapsible: Story = {
   args: { collapsible: false },
   name: 'collapsible false',

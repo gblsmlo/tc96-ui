@@ -34,10 +34,12 @@ type EntriesCallbacks = Pick<
   Finance3EntriesProps,
   | 'onAccountChange'
   | 'onAccountFilterChange'
+  | 'onAmountChange'
   | 'onBulkResponsibleChange'
   | 'onBulkSettle'
   | 'onCategoryChange'
   | 'onCreate'
+  | 'onDueChange'
   | 'onFeeTypeFilterChange'
   | 'onHiddenColumnsChange'
   | 'onOpen'
@@ -132,11 +134,13 @@ export const ComposedFinance3 = ({
   headerActions,
   onAccountChange,
   onAccountFilterChange,
+  onAmountChange,
   onBulkResponsibleChange,
   onBulkSettle,
   onCategoryChange,
   onContact,
   onCreate,
+  onDueChange,
   onExport,
   onFeeTypeFilterChange,
   onHiddenColumnsChange,
@@ -249,6 +253,7 @@ export const ComposedFinance3 = ({
               }
             : undefined
         }
+        onOpen={openable ? (onOpen ?? noop) : undefined}
         onPageChange={changePage}
         onReissueCharge={onReissueCharge ?? noop}
         truncated={truncated}
@@ -341,6 +346,14 @@ export const ComposedFinance3 = ({
         firstPage()
         onAccountFilterChange?.(next)
       }}
+      onAmountChange={
+        editable
+          ? (id, amount) => {
+              updateEntries([id], { amount })
+              onAmountChange?.(id, amount)
+            }
+          : undefined
+      }
       onBulkResponsibleChange={
         bulkActions
           ? (ids, responsibleId) => {
@@ -367,6 +380,14 @@ export const ComposedFinance3 = ({
           ? (id, categoryId) => {
               updateEntries([id], { categoryId })
               onCategoryChange?.(id, categoryId)
+            }
+          : undefined
+      }
+      onDueChange={
+        editable
+          ? (id, dueOn) => {
+              updateEntries([id], { dueOn })
+              onDueChange?.(id, dueOn)
             }
           : undefined
       }

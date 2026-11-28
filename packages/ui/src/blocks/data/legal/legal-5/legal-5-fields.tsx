@@ -51,7 +51,7 @@ export function Legal5PhaseField({
     <DataSelect<string>
       ariaLabel={labels.columns.phase}
       onChange={
-        onPhaseChange && !readOnly
+        onPhaseChange && !readOnly && !item.readOnly
           ? (phaseId) => {
               if (phaseId !== item.phaseId) onPhaseChange(item.id, phaseId)
             }
@@ -78,7 +78,7 @@ export function Legal5OwnerField({
       ariaLabel={labels.columns.owner}
       avatarOnly={avatarOnly}
       onChange={
-        onOwnerChange
+        onOwnerChange && !item.readOnly
           ? (ownerId) => {
               if (ownerId !== item.ownerId) onOwnerChange(item.id, ownerId)
             }
@@ -137,7 +137,7 @@ export function Legal5ClientsField({ context, item }: FieldProps) {
 
 export function Legal5TagsField({ context, item }: FieldProps) {
   const { labels, onTagsChange, tags, tagsLoading } = context
-  if (onTagsChange)
+  if (onTagsChange && !item.readOnly)
     return (
       <TagsProperty
         ariaLabel={labels.columns.tags}
@@ -146,6 +146,7 @@ export function Legal5TagsField({ context, item }: FieldProps) {
         labels={labels.tagPicker}
         onValueChange={(tagIds) => onTagsChange(item.id, [...tagIds])}
         options={tags.map((tag) => ({ label: tag.label, value: tag.id }))}
+        placeholder={labels.tagPicker.add}
         value={item.tagIds}
         variant="badge"
       />
@@ -171,7 +172,11 @@ export const hasLegal5KindMark = (item: Legal5Record) =>
 export const canUnarchiveLegal5 = (
   context: Legal5FieldContext,
   item: Legal5Record,
-) => Boolean(context.onUnarchive) && item.archived && item.kind === 'lawsuit'
+) =>
+  Boolean(context.onUnarchive) &&
+  item.archived &&
+  item.kind === 'lawsuit' &&
+  !item.readOnly
 
 export function Legal5KindMark({ context, item }: FieldProps) {
   const { labels } = context

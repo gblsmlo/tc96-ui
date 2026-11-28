@@ -56,6 +56,7 @@ export interface Legal5Record {
   number: string | null
   ownerId: string | null
   phaseId: string
+  readOnly?: boolean
   tagIds: string[]
   title: string
 }
@@ -159,6 +160,7 @@ export interface Legal5Props extends DataCollectionLoadProps {
   groupBy?: Legal5GroupBy | null
   labels?: Legal5LabelsOverride
   mode?: Legal5Mode
+  modes?: readonly Legal5Mode[]
   onArchivedFilterChange?: (archived: Legal5Archived | null) => void
   onBulkArchive?: (recordIds: string[]) => void
   onBulkOwnerChange?: (recordIds: string[], ownerId: string) => void

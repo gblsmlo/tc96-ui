@@ -1,10 +1,5 @@
-import { ArrowsOutSimpleIcon } from '@phosphor-icons/react'
 import { Button } from '@tc96/ui/button'
-import {
-  RecordPreview,
-  RecordPreviewAction,
-  RecordPreviewBody,
-} from '@tc96/ui/patterns'
+import { RecordPreview, RecordPreviewBody } from '@tc96/ui/patterns'
 import { useState } from 'react'
 import type { RecordPreviewControls } from './record-preview-controls.ts'
 
@@ -13,6 +8,13 @@ const shortParagraphs = [
   "Groups, fields and widgets are the consumer's, stacked as it sees fit.",
   'The header and the footer stay in place while the panel scrolls.',
 ]
+
+const moreActions = [
+  { id: 'duplicate', label: 'Duplicate' },
+  { id: 'archive', label: 'Archive' },
+]
+
+const ignore = () => undefined
 
 const longParagraphs = Array.from(
   { length: 24 },
@@ -25,14 +27,16 @@ interface ComposedRecordPreviewProps extends RecordPreviewControls {
 }
 
 export const ComposedRecordPreview = ({
-  actionLabel,
-  actions,
   body,
   closeLabel,
   defaultOpen = true,
   description,
+  expand,
+  expandLabel,
   footer,
   longContent,
+  more,
+  moreLabel,
   title,
   trigger,
 }: Readonly<ComposedRecordPreviewProps>) => {
@@ -51,15 +55,9 @@ export const ComposedRecordPreview = ({
         {trigger}
       </Button>
       <RecordPreview
-        actions={
-          actions ? (
-            <RecordPreviewAction label={actionLabel}>
-              <ArrowsOutSimpleIcon aria-hidden />
-            </RecordPreviewAction>
-          ) : undefined
-        }
         closeLabel={closeLabel}
         description={description || undefined}
+        expand={expand ? { label: expandLabel, onClick: ignore } : undefined}
         footer={
           footer ? (
             <>
@@ -69,6 +67,11 @@ export const ComposedRecordPreview = ({
               <Button>Restore</Button>
             </>
           ) : undefined
+        }
+        more={
+          more
+            ? { actions: moreActions, label: moreLabel, onAction: ignore }
+            : undefined
         }
         onOpenChange={setOpen}
         open={open}

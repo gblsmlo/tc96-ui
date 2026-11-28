@@ -10,6 +10,7 @@ import {
 } from '../../shared/collection/data-collection'
 import { DataCollectionFrame } from '../../shared/collection/data-collection-frame'
 import { dataCollectionLoadState } from '../../shared/collection/data-collection-load-state'
+import { DataCollectionListHeader } from '../../shared/collection/data-collection-record-parts'
 import { DataCollectionViewSwitcher } from '../../shared/collection/data-collection-view-switcher'
 import {
   defaultDataCollectionLocale,
@@ -156,6 +157,70 @@ export function Legal7({
     () => Object.fromEntries(selectedIds.map((id) => [id, true as const])),
     [selectedIds],
   )
+  const listSelectable = Boolean(
+    selectedIdsProp ||
+      onSelectedIdsChange ||
+      onCreateDeadline ||
+      onCreateLawsuit ||
+      onCreateTask ||
+      onDiscard ||
+      onLinkDeadline ||
+      onLinkLawsuit ||
+      onNoDeadline,
+  )
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
+  const listSelection = useMemo(
+    () =>
+      listSelectable
+        ? {
+            onSelectedChange: (publicationId: string, checked: boolean) =>
+              setSelectedIds(
+                checked
+                  ? [
+                      ...selectedIds.filter((id) => id !== publicationId),
+                      publicationId,
+                    ]
+                  : selectedIds.filter((id) => id !== publicationId),
+              ),
+            selectedIds: selectedSet,
+          }
+        : undefined,
+    [listSelectable, selectedIds, selectedSet, setSelectedIds],
+  )
+  const selectedRows = useMemo(
+    () => publications.filter((item) => selectedSet.has(item.id)),
+    [publications, selectedSet],
+  )
+  const allSelected =
+    publications.length > 0 &&
+    publications.every((item) => selectedSet.has(item.id))
+  const clearSelection = () => setSelectedIds(noSelection)
+  const selectionBar = (
+    rows: readonly Legal7Publication[],
+    clear: () => void,
+  ) => (
+    <ActionBar
+      actions={createLegal7SelectionActions({
+        labels,
+        onCreateDeadline,
+        onCreateLawsuit,
+        onCreateTask,
+        onDiscard,
+        onLinkDeadline,
+        onLinkLawsuit,
+        onNoDeadline,
+        selectedRows: rows,
+      })}
+      className="pointer-events-auto"
+      clearSelectionLabel={labels.clearSelection}
+      formatSelection={labels.selectedCount}
+      label={labels.selectionActions}
+      notice={isLegal7MixedSelection(rows) ? labels.bulkHint : undefined}
+      onClearSelection={clear}
+      selectedCount={rows.length}
+      selectedRows={rows}
+    />
+  )
   const { table } = useDataTable<Legal7Publication>({
     columns,
     data: publications,
@@ -250,44 +315,40 @@ export function Legal7({
           }
           getRowOpenLabel={openLabelOf}
           label={labels.title}
+          listHeader={
+            listSelectable && publications.length > 0 ? (
+              <DataCollectionListHeader
+                selection={{
+                  checked: allSelected,
+                  indeterminate: selectedSet.size > 0 && !allSelected,
+                  label: labels.selectAll,
+                  onCheckedChange: (checked) =>
+                    setSelectedIds(
+                      checked
+                        ? publications.map((item) => item.id)
+                        : noSelection,
+                    ),
+                }}
+                title={labels.title}
+              />
+            ) : undefined
+          }
           mode={mode}
           onOpen={
             openPublication ? (item) => openPublication(item.id) : undefined
           }
-          renderListRecord={renderLegal7ListRow(context)}
-          selectionActions={({
-            clearSelection,
-            selectedCount,
-            selectedRows,
-          }) => (
-            <ActionBar
-              actions={createLegal7SelectionActions({
-                labels,
-                onCreateDeadline,
-                onCreateLawsuit,
-                onCreateTask,
-                onDiscard,
-                onLinkDeadline,
-                onLinkLawsuit,
-                onNoDeadline,
-                selectedRows,
-              })}
-              clearSelectionLabel={labels.clearSelection}
-              formatSelection={labels.selectedCount}
-              label={labels.selectionActions}
-              notice={
-                isLegal7MixedSelection(selectedRows)
-                  ? labels.bulkHint
-                  : undefined
-              }
-              onClearSelection={clearSelection}
-              selectedCount={selectedCount}
-              selectedRows={selectedRows}
-            />
-          )}
+          renderListRecord={renderLegal7ListRow(context, listSelection)}
+          selectionActions={({ clearSelection: clear, selectedRows: rows }) =>
+            selectionBar(rows, clear)
+          }
           table={table}
         />
       )}
+      {!loadState && mode === 'list' && listSelectable ? (
+        <div className="pointer-events-none sticky bottom-3 flex justify-center">
+          {selectionBar(selectedRows, clearSelection)}
+        </div>
+      ) : null}
     </DataCollectionFrame>
   )
 }

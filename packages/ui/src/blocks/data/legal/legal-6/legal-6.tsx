@@ -1,5 +1,6 @@
 'use client'
 
+import { ActionBar } from '@tc96/ui/patterns/action-bar/components/action-bar'
 import { useDataTable } from '@tc96/ui/patterns/data-table/use-data-table'
 import { useMemo } from 'react'
 import {
@@ -24,6 +25,7 @@ import { createLegal6Columns } from './legal-6-columns'
 import type { Legal6FieldContext } from './legal-6-fields'
 import { Legal6Footer } from './legal-6-footer'
 import { legal6Views, nextLegal6ViewWithItems } from './legal-6-options'
+import { createLegal6SelectionActions } from './legal-6-selection-actions'
 import { Legal6Settings } from './legal-6-settings'
 import { Legal6Skeleton } from './legal-6-skeleton'
 import type {
@@ -37,6 +39,8 @@ export { legal6Sorts, legal6Views } from './legal-6-options'
 
 const noOwners: NonNullable<Legal6Props['owners']> = []
 const noKinds: NonNullable<Legal6Props['kinds']> = []
+const noIds: string[] = []
+
 export function Legal6({
   className,
   counts,
@@ -52,6 +56,9 @@ export function Legal6({
   loadingMore = false,
   loadMoreError = false,
   locale = defaultDataCollectionLocale,
+  onBulkConfirm,
+  onBulkOwnerChange,
+  onBulkReject,
   onConfirm,
   onCreate,
   onKindFilterChange,
@@ -67,6 +74,7 @@ export function Legal6({
   onSavedViewSelect,
   onSavedViewUpdate,
   onSavePreference,
+  onSelectedIdsChange,
   onSortChange,
   onViewChange,
   ownerFilter: ownerFilterProp,
@@ -78,8 +86,10 @@ export function Legal6({
   savedViews,
   savedViewsLoading,
   savedViewsPending,
+  selectedIds: selectedIdsProp,
   sort: sortProp,
   timeZone = defaultDataCollectionTimeZone,
+  unassignable = true,
   view: viewProp,
   views: viewsProp,
 }: Readonly<Legal6Props>) {
@@ -110,6 +120,18 @@ export function Legal6({
     kindFilterProp,
     null,
     onKindFilterChange,
+  )
+  const [selectedIds, setSelectedIds] = useControllable<string[]>(
+    selectedIdsProp,
+    noIds,
+    onSelectedIdsChange,
+  )
+  const selectable = Boolean(
+    selectedIdsProp ||
+      onSelectedIdsChange ||
+      onBulkConfirm ||
+      onBulkOwnerChange ||
+      onBulkReject,
   )
   const openDeadline = useStableHandler(onOpen)
   const confirm = useStableHandler(onConfirm)
@@ -142,13 +164,21 @@ export function Legal6({
   )
 
   const columns = useMemo(
-    () => createLegal6Columns(context, decides),
-    [context, decides],
+    () => createLegal6Columns(context, decides, selectable),
+    [context, decides, selectable],
+  )
+  const rowSelection = useMemo(
+    () => Object.fromEntries(selectedIds.map((id) => [id, true as const])),
+    [selectedIds],
   )
   const { table } = useDataTable<Legal6Deadline>({
     columns,
     data: deadlines,
+    enableRowSelection: selectable,
     getRowId: (item) => item.id,
+    onRowSelectionChange: (selection) =>
+      setSelectedIds(Object.keys(selection).filter((id) => selection[id])),
+    rowSelection,
   })
 
   const nextView =
@@ -251,6 +281,31 @@ export function Legal6({
           label={labels.tableLabel(labels.title, labels.views[view])}
           mode="table"
           onOpen={openDeadline ? (item) => openDeadline(item.id) : undefined}
+          selectionActions={
+            selectable
+              ? ({ clearSelection, selectedCount, selectedRows }) => (
+                  <ActionBar
+                    actions={createLegal6SelectionActions({
+                      decidable: view === 'proposed',
+                      labels,
+                      onBulkConfirm,
+                      onBulkOwnerChange,
+                      onBulkReject,
+                      onDone: clearSelection,
+                      owners,
+                      selectedRows,
+                      unassignable,
+                    })}
+                    clearSelectionLabel={labels.clearSelection}
+                    formatSelection={labels.selectedCount}
+                    label={labels.selectionActions}
+                    onClearSelection={clearSelection}
+                    selectedCount={selectedCount}
+                    selectedRows={selectedRows}
+                  />
+                )
+              : undefined
+          }
           table={table}
         />
       )}

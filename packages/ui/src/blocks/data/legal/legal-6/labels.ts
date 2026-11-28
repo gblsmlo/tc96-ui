@@ -9,6 +9,7 @@ export const defaultLegal6Labels: Legal6Labels = {
   ...defaultDataCollectionLoadLabels,
   allKinds: 'Todos os tipos',
   allOwners: 'Todos os responsáveis',
+  clearSelection: 'Limpar seleção',
   clearFilters: defaultDataCollectionToolbarLabels.clearFilters,
   clientList: (clients) => clients.join(', '),
   columns: {
@@ -55,6 +56,12 @@ export const defaultLegal6Labels: Legal6Labels = {
   },
   savePreference: 'Salvar preferência',
   seeView: (view) => `Ver ${view}`,
+  selectAll: 'Selecionar todos os prazos',
+  selectDeadline: (label, lawsuitTitle) =>
+    `Selecionar prazo ${label} de ${lawsuitTitle}`,
+  selectedCount: (count) =>
+    `${count} ${count === 1 ? 'selecionado' : 'selecionados'}`,
+  selectionActions: 'Ações dos prazos selecionados',
   sort: 'Ordenar',
   sortBy: 'Ordenar por',
   sorts: {
